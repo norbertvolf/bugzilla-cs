@@ -1,0 +1,186 @@
+[%# The contents of this file are subject to the Mozilla Public
+  # License Version 1.1 (the "License"); you may not use this file
+  # except in compliance with the License. You may obtain a copy of
+  # the License at http://www.mozilla.org/MPL/
+  #
+  # Software distributed under the License is distributed on an "AS
+  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+  # implied. See the License for the specific language governing
+  # rights and limitations under the License.
+  #
+  # The Original Code is the Bugzilla Bug Tracking System.
+  #
+  # The Initial Developer of the Original Code is Netscape Communications
+  # Corporation. Portions created by Netscape are
+  # Copyright (C) 1998 Netscape Communications Corporation. All
+  # Rights Reserved.
+  #
+  # Contributor(s): Gervase Markham <gerv@gerv.net>
+  #                 Elliotte Martin <elliotte_martin@yahoo.com>
+  #%]
+
+[%# Remember to PROCESS rather than INCLUDE this template. %]
+
+[% PROCESS global/variables.none.tmpl %]
+
+[% SET search_descs = {
+  "noop"           => "---",
+  "equals"         => "rovná se",
+  "notequals"      => "nerovná se",
+  "anyexact"       => "rovná se jakémukoli z řetězců",
+  "substring"      => "obsahuje řetězec",
+  "casesubstring"  => "obsahuje řetězec (exact case)",
+  "notsubstring"   => "neobsahuje řetězec",
+  "anywordssubstr" => "obsahuje jakýkoli z řetězců",
+  "allwordssubstr" => "obsahuje všechny řetězce",
+  "nowordssubstr"  => "neobsahuje žádný z řetězců",
+  "regexp"         => "odpovídá regulárnímu výrazu",
+  "notregexp"      => "neodpovídá regulárnímu výrazu",
+  "lessthan"       => "je menší než",
+  "lessthaneq"     => "je menší nebo rovno",
+  "greaterthan"    => "je větší než",
+  "greaterthaneq"  => "je větší nebo rovno",
+  "anywords"       => "obsahuje jakékoli ze slov",
+  "allwords"       => "obsahuje všechna slova",
+  "nowords"        => "neobsahuje žádné ze slov",
+  "changedbefore"  => "změněno před",
+  "changedafter"   => "změněno po",
+  "changedfrom"    => "změněno z",
+  "changedto"      => "změněno na",
+  "changedby"      => "změněno kým",
+  "matches"        => "odpovídá",
+  "notmatches"      => "neodpovídá",
+} %]
+
+[% field_types = { ${constants.FIELD_TYPE_UNKNOWN}       => "Unknown Type",
+                   ${constants.FIELD_TYPE_FREETEXT}      => "Free Text",
+                   ${constants.FIELD_TYPE_SINGLE_SELECT} => "Drop Down",
+                   ${constants.FIELD_TYPE_MULTI_SELECT}  => "Multiple-Selection Box",
+                   ${constants.FIELD_TYPE_TEXTAREA}      => "Large Text Box",
+                   ${constants.FIELD_TYPE_DATETIME}      => "Date/Time",
+                   ${constants.FIELD_TYPE_BUG_ID}        => "$terms.Bug ID",
+                } %]
+
+[%# You can use this hash to localize (translate) the values displayed
+  # for drop-down and multiple-select fields. Lines starting with "#"
+  # are comments.
+  #%]
+[% value_descs = {
+  "bug_status" => {
+    "UNCONFIRMED" => "Nepotvrzený",
+    "NEW"         => "Nový",
+    "ASSIGNED"    => "Přiřazený",
+    "REOPENED"    => "Znovu otevřený",
+    "RESOLVED"    => "Vyřešený",
+    "VERIFIED"    => "Ověřený",
+    "CLOSED"      => "Uzavřený",
+  },
+
+  "resolution" => {
+   "---"        => "---",
+   "FIXED"      => "Opravený",
+   "INVALID"    => "Neplatný",
+   "WONTFIX"    => "Málo informaci",
+   "DUPLICATE"  => "Duplikát",
+   "WORKSFORME" => "Nelze opakovat",
+   "MOVED"      => "Předsunutý",
+   " "          => " ",
+  },
+} %]
+
+[%# We use "FILTER none" here because only the caller can know how to
+  # filter the result appropriately. 
+  #%]
+[% MACRO display_value(field_name, value_name) BLOCK %][% FILTER trim %]
+  [% IF value_descs.${field_name}.${value_name}.defined %]
+    [% value_descs.${field_name}.${value_name} FILTER none %]
+  [% ELSE %]
+    [% value_name FILTER none %]
+  [% END %]
+[% END %][% END %]
+
+[% IF in_template_var %]
+  [% vars.terms = terms %]
+
+  [%# field_descs is loaded as a global template variable and cached
+    # across all templates--see VARIABLES in Bugzilla/Template.pm.
+    #%]
+  [% vars.field_descs = {
+    "[Bug creation]"          => "[Zadání $terms.bugu]",
+     "actual_time"             => "Odpracováno"
+     "alias"                   => "Alias",
+     "assigned_to"             => "Příjemce",
+     "attach_data.thedata"     => "Příloha",
+     "attachments.description" => "Popis přílohy",
+     "attachments.filename"    => "Název souboru přílohy",
+     "attachments.mimetype"    => "MIME typ přílohy",
+     "attachments.ispatch"     => "Příloha je záplata",
+     "attachments.isobsolete"  => "Příloha je překonaná",
+     "attachments.isprivate"   => "Příloha je důvěrná",
+     "attachments.isurl"       => "Příloha je URL",
+     "attachments.submitter"   => "Tvůrce přílohy",
+     "blocked"                 => "Blokuje",
+     "bug_file_loc"            => "URL",
+     "bug_group"               => "Skupina",
+     "bug_id"                  => "ID $terms.bugu",
+     "bug_severity"            => "Závažnost",
+     "bug_status"              => "Stav",
+     "changeddate"             => "Změněno",
+     "cc"                      => "Kopie",
+     "classification"          => "Klasifikace",
+     "cclist_accessible"       => "Seznam do Kopie přístupný",
+     "commenter"               => "Komentující",
+     "component_id"            => "ID komponenty",
+     "component"               => "Komponenta",
+     "content"                 => "Obsah",
+     "creation_ts"             => "Datum vytvoření",
+     "deadline"                => "Termín",
+     "delta_ts"                => "Změněno",
+     "dependson"               => "Závisí na",
+     "dup_id"                  => "Duplikát",
+     "estimated_time"          => "Pův. odhad",
+     "everconfirmed"           => "Potvrzeno",
+     "flagtypes.name"          => "Příznak",
+     "keywords"                => "Klíčová slova",
+     "longdesc"                => "Komentář",
+     "longdescs.isprivate"     => "Komentář je důvěrný",
+     "newcc"                   => "Kopie",
+     "op_sys"                  => "OS",
+     "opendate"                => "Otevřeno",
+     "owner_idle_time"         => "Doba nečinnosti",
+     "percentage_complete"     => "Hotovo %",
+     "priority"                => "Priorita",
+     "product_id"              => "ID produktu",
+     "product"                 => "Produkt",
+     "qa_contact"              => "QA Kontakt",
+     "remaining_time"          => "Zbývá",
+     "rep_platform"            => "Hardware",
+     "reporter"                => "Nahlásil",
+     "reporter_accessible"     => "Přístup oznamovatele",
+     "requestees.login_name"   => "Kdo požaduje příznak",
+     "resolution"              => "Řešení",
+     "see_also"                => "Viz také",
+     "setters.login_name"      => "Kdo nastaví příznak",
+     "setting"                 => "Nastavení",
+     "settings"                => "Nastavení",
+     "short_desc"              => "Předmět",
+     "status_whiteboard"       => "Whiteboard",
+     "target_milestone"        => "Milník",
+     "version"                 => "Verze",
+     "votes"                   => "Hlasy",
+     "work_time"               => "Odpracováno",
+  } %]
+
+  [%# Also include any custom fields or fields which don't have a
+      Description here, by copying their Description from the
+      database. If you want to override this for your language
+      or your installation, just use a hook. %]
+  [% UNLESS Param('shutdownhtml') %]
+    [% FOREACH bz_field = bug_fields.values %]
+      [% SET vars.field_descs.${bz_field.name} = bz_field.description
+         IF !vars.field_descs.${bz_field.name}.defined %]
+    [% END %]
+  [% END %]
+[% END %]
+
+[% Hook.process("end") %]

@@ -1,0 +1,81 @@
+[%# The contents of this file are subject to the Mozilla Public
+  # License Version 1.1 (the "License"); you may not use this file
+  # except in compliance with the License. You may obtain a copy of
+  # the License at http://www.mozilla.org/MPL/
+  #
+  # Software distributed under the License is distributed on an "AS
+  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+  # implied. See the License for the specific language governing
+  # rights and limitations under the License.
+  #
+  # The Original Code is the Bugzilla Bug Tracking System.
+  #
+  # The Initial Developer of the Original Code is Netscape Communications
+  # Corporation. Portions created by Netscape are
+  # Copyright (C) 1998 Netscape Communications Corporation. All
+  # Rights Reserved.
+  #
+  # Contributor(s): Gervase Markham <gerv@gerv.net>
+  #%]
+
+[%# INTERFACE:
+  # This template has no interface. It's a list of the available report
+  # types in Bugzilla.
+  #%]
+
+[% PROCESS global/variables.none.tmpl %]
+
+[% PROCESS global/header.html.tmpl
+  title = "Sestavy a grafy"
+  doc_section = "reporting.html"
+  style_urls = ['skins/standard/reports.css']
+%]
+
+<p>
+  [% terms.Bugzilla %] vám umožňuje sledovat a prohlížet stav [% terms.bugsu %] několika způsoby:
+</p>
+
+<h2>Aktulní stav</h2>
+
+<ul>
+  <li id="report_search">
+    <strong><a href="query.cgi">Hledání</a></strong> -
+    zobrazit seznam [% terms.bugsu %].
+  </li>
+  <li id="report_tabular">
+    <strong>
+      <a href="query.cgi?format=report-table">Sestavy</a>
+    </strong> - zobrazit sestavy [% terms.bugsu %] v 1, 2 nebo 3 rozměrech jako HTML nebo CSV.
+  </li>
+  [% IF feature_enabled('graphical_reports') %]
+    <li id="report_graphical">
+      <strong>
+        <a href="query.cgi?format=report-graph">Grafy</a>
+      </strong> - spojnicové, sloupcové nebo koláčové grafy.
+    </li>
+  [% END %]
+  [% Hook.process('current_state') %]
+</ul>
+
+[% IF feature_enabled('new_charts') OR feature_enabled('old_charts') %]
+  <h2>Časové řady</h2>
+
+  <ul>
+    [% IF feature_enabled('old_charts') %]
+      <li id="old_charts">
+        <strong><a href="reports.cgi">Stará verze grafů</a></strong> - 
+        vykreslit stav nebo řešení [% terms.bugsu %] v čase, pro jednotlivé produkty
+      </li>
+    [% END %]
+    [% IF feature_enabled('new_charts') AND user.in_group(Param("chartgroup")) %]
+      <li id="new_charts">
+        <strong><a href="chart.cgi">Nová verze grafů</a></strong> - 
+        vykreslit libovolné výběr [% terms.bugsu %] v čase. Užitečnější.
+      </li>
+    [% END %]
+  </ul>
+[% END %]
+
+[% Hook.process('end') %]
+
+[% PROCESS global/footer.html.tmpl %]

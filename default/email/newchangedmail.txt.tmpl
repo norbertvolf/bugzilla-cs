@@ -40,6 +40,12 @@ X-Bugzilla-Target-Milestone: [% targetmilestone %]
 X-Bugzilla-Changed-Fields: [% changedfields %]
 [%+ threadingmarker %]
 
+[%+ urlbase %]show_bug.cgi?id=[% bugid %]
+[%- IF diffs %]
+
+[%+ diffs %]
+[% END -%]
+
 [% FOREACH comment = new_comments %]
 
 [%- IF comment.count %]
@@ -48,19 +54,13 @@ X-Bugzilla-Changed-Fields: [% changedfields %]
 [%+ comment.body_full({ is_bugmail => 1, wrap => 1 }) %]
 [% END %]
 
-[%+ urlbase %]show_bug.cgi?id=[% bugid %]
-[%- IF diffs %]
-
-[%+ diffs %]
-[% END -%]
-
 -- [%# Protect the trailing space of the signature marker %]
 Konfigurace zpráv: [% urlbase %]userprefs.cgi?tab=email
 ------- Tento email jste přijal z tohoto důvodu: -------
 [% FOREACH relationship = reasons %]
   [% SWITCH relationship %]
     [% CASE constants.REL_ASSIGNEE %]
-Jset uveden jako příjemce [% terms.bug2 %].
+Jste uveden jako příjemce [% terms.bug2 %].
     [% CASE constants.REL_REPORTER %]
 Nahlásil jste tento [% terms.bug %].
     [% CASE constants.REL_QA %]

@@ -67,24 +67,14 @@
   #%]
 [% value_descs = {
   "bug_status" => {
-    "UNCONFIRMED" => "Nepotvrzený",
-    "NEW"         => "Nový",
-    "ASSIGNED"    => "Přiřazený",
-    "REOPENED"    => "Znovu otevřený",
-    "RESOLVED"    => "Vyřešený",
-    "VERIFIED"    => "Ověřený",
-    "CLOSED"      => "Uzavřený",
+    # "UNCONFIRMED" => "UNCO",
+    # "CONFIRMED"   => "ITSABUG",
   },
 
   "resolution" => {
-   "---"        => "---",
-   "FIXED"      => "Opravený",
-   "INVALID"    => "Neplatný",
-   "WONTFIX"    => "Málo informaci",
-   "DUPLICATE"  => "Duplikát",
-   "WORKSFORME" => "Nelze opakovat",
-   "MOVED"      => "Předsunutý",
-   " "          => " ",
+    ""        => "---",
+    # "FIXED"      => "NO LONGER AN ISSUE",
+    # "WORKSFORME" => "NOTMYPROBLEM!",
   },
 } %]
 
@@ -107,9 +97,10 @@
     #%]
   [% vars.field_descs = {
     "[Bug creation]"          => "[Zadání $terms.bugu]",
-     "actual_time"             => "Odpracováno"
+     "actual_time"             => "Odpracováno",
      "alias"                   => "Alias",
      "assigned_to"             => "Příjemce",
+     "assigned_to_realname"    => "Příjemce Podpis",
      "attach_data.thedata"     => "Příloha",
      "attachments.description" => "Popis přílohy",
      "attachments.filename"    => "Název souboru přílohy",
@@ -153,10 +144,12 @@
      "product_id"              => "ID produktu",
      "product"                 => "Produkt",
      "qa_contact"              => "QA Kontakt",
+     "qa_contact_realname"     => "QA Kontact Jméno",
      "remaining_time"          => "Zbývá",
      "rep_platform"            => "Hardware",
      "reporter"                => "Nahlásil",
      "reporter_accessible"     => "Přístup oznamovatele",
+     "reporter_realname"       => "Jméno oznamovatel",
      "requestees.login_name"   => "Kdo požaduje příznak",
      "resolution"              => "Řešení",
      "see_also"                => "Viz také",
@@ -167,7 +160,6 @@
      "status_whiteboard"       => "Whiteboard",
      "target_milestone"        => "Milník",
      "version"                 => "Verze",
-     "votes"                   => "Hlasy",
      "work_time"               => "Odpracováno",
   } %]
 

@@ -25,7 +25,7 @@
 <ul class="links">
   <li><a href="./">Hlavní strana</a></li>
   <li><span class="separator">| </span><a href="enter_bug.cgi">Nový</a></li>
-  <li><span class="separator">| </span><a href="describecomponents.cgi">Komponenty</a></li>
+  <li><span class="separator">| </span><a href="describecomponents.cgi">Prohlížet</a></li>
   <li><span class="separator">| </span><a href="query.cgi">Hledat</a></li>
 
   <li class="form">
@@ -34,7 +34,8 @@
         onsubmit="if (this.quicksearch.value == '')
                   { alert('Please enter one or more search terms first.');
                     return false; } return true;">
-    <input class="txt" type="text" id="quicksearch[% qs_suffix FILTER html %]" name="quicksearch">
+    <input class="txt" type="text" id="quicksearch[% qs_suffix FILTER html %]" name="quicksearch" 
+           value="[% quicksearch FILTER html %]">
     <input class="btn" type="submit" value="Hledat" 
            id="find[% qs_suffix FILTER html %]">
     [%-# Work around FF bug: keep this on one line %]</form>
@@ -61,7 +62,7 @@
           || user.in_group('editcomponents') || user.in_group('admin') || user.in_group('creategroups')
           || user.in_group('editkeywords') || user.in_group('bz_canusewhines')
           || user.get_products_by_permission("editcomponents").size %]
-      <li><span class="separator">| </span><a href="admin.cgi">Správa</a></li>
+      <li><span class="separator">| </span><a href="admin.cgi">Administrace</a></li>
     [% END %]
 
     [% PROCESS link_to_documentation %]
@@ -69,14 +70,14 @@
     <li>
       <span class="separator">| </span>
       [% IF user.authorizer.can_logout %]
-        <a href="index.cgi?logout=1">Odhlásit se</a>
+        <a href="index.cgi?logout=1">Odhlásit</a>
       [% ELSE %]
         Přihlášen&nbsp;jako
       [% END %]
       [% IF sudoer %]
         [%+ sudoer.login FILTER html %] (<b>vtělěný v
         [%+ user.login FILTER html %]</b>
-        <a href="relogin.cgi?action=end-sudo">ukončit sezení</a>)
+        <a href="relogin.cgi?action=end-sudo">ukončit relaci</a>)
       [% ELSE %]
         [%+ user.login FILTER html %]
       [% END %]

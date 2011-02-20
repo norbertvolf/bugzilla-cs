@@ -19,37 +19,39 @@
   #%]
 
 [% PROCESS "global/variables.none.tmpl" %]
+[% PROCESS "global/reason-descs.none.tmpl" %]
+
 From: [% Param('mailfrom') %]
 To: [% to_user.email %]
-Subject: [[% terms.Bug %] [%+ bugid %]] [% 'Nový: ' IF isnew %][%+ summary %]
+Subject: [[% terms.Bug %] [%+ bug.id %]] [% 'Nový: ' IF isnew %][%+ bug.short_desc %]
+Date: [% bug.delta_ts FILTER time("%a, %d %b %Y %T %z", to_user.timezone) %]
 X-Bugzilla-Reason: [% reasonsheader %]
 X-Bugzilla-Type: [% isnew ? 'new' : 'changed' %]
 X-Bugzilla-Watch-Reason: [% reasonswatchheader %]
 [% IF Param('useclassification') %]
-X-Bugzilla-Classification: [% classification %]
+X-Bugzilla-Classification: [% bug.classification %]
 [% END %]
-X-Bugzilla-Product: [% product %]
-X-Bugzilla-Component: [% comp %]
-X-Bugzilla-Keywords: [% keywords %]
-X-Bugzilla-Severity: [% severity %]
-X-Bugzilla-Who: [% changer %]
-X-Bugzilla-Status: [% status %]
-X-Bugzilla-Priority: [% priority %]
-X-Bugzilla-Assigned-To: [% assignedto %]
-X-Bugzilla-Target-Milestone: [% targetmilestone %]
-X-Bugzilla-Changed-Fields: [% changedfields %]
+X-Bugzilla-Product: [% bug.product %]
+X-Bugzilla-Component: [% bug.component %]
+X-Bugzilla-Keywords: [% bug.keywords %]
+X-Bugzilla-Severity: [% bug.bug_severity %]
+X-Bugzilla-Who: [% changer.login %]
+X-Bugzilla-Status: [% bug.bug_status %]
+X-Bugzilla-Priority: [% bug.priority %]
+X-Bugzilla-Assigned-To: [% bug.assigned_to.login %]
+X-Bugzilla-Target-Milestone: [% bug.target_milestone %]
+X-Bugzilla-Changed-Fields: [% changedfields.join(" ") %]
 [%+ threadingmarker %]
 
-[%+ urlbase %]show_bug.cgi?id=[% bugid %]
+[%+ urlbase %]show_bug.cgi?id=[% bug.id %]
 [%- IF diffs %]
 
 [%+ diffs %]
 [% END -%]
-
 [% FOREACH comment = new_comments %]
 
 [%- IF comment.count %]
---- Komentář #[% comment.count %] od [% comment.author.identity %] [%+ comment.time FILTER time(undef, to_user.timezone) %] ---
+--- Komentář #[% comment.count %] od [% comment.author.identity %] [%+ comment.creation_ts FILTER time(undef, to_user.timezone) %] ---
 [% END %]
 [%+ comment.body_full({ is_bugmail => 1, wrap => 1 }) %]
 [% END %]
@@ -57,33 +59,12 @@ X-Bugzilla-Changed-Fields: [% changedfields %]
 -- [%# Protect the trailing space of the signature marker %]
 Konfigurace zpráv: [% urlbase %]userprefs.cgi?tab=email
 ------- Tento email jste přijal z tohoto důvodu: -------
-[% FOREACH relationship = reasons %]
-  [% SWITCH relationship %]
-    [% CASE constants.REL_ASSIGNEE %]
-Jste uveden jako příjemce [% terms.bug2 %].
-    [% CASE constants.REL_REPORTER %]
-Nahlásil jste tento [% terms.bug %].
-    [% CASE constants.REL_QA %]
-Jste QA kontakt pro tento [% terms.bug %].
-    [% CASE constants.REL_CC %]
-Jste uveden v seznamu do Kopie tohoto [% terms.bug2 %].
-    [% CASE constants.REL_VOTER %]
-Dal jste hlas tomuto[% terms.bug2 %].
-    [% CASE constants.REL_GLOBAL_WATCHER %]
-Sledujete všechny změny [% terms.bugsu %].
-  [% END %]
+[% SET reason_lines = [] %]
+[% FOREACH reason = reasons %]
+  [% reason_lines.push(reason_descs.$reason) IF reason_descs.$reason %]
 [% END %]
-[% FOREACH relationship = reasons_watch %]
-  [% SWITCH relationship %]
-    [% CASE constants.REL_ASSIGNEE %]
-Sledujete příjemce tohoto [% terms.bug2 %].
-    [% CASE constants.REL_REPORTER %]
-Sledujete toho kdo nahlásil tento [% terms.bug %].
-    [% CASE constants.REL_QA %]
-Sledujete toho QA kontakt tohoto [% terms.bug2 %].
-    [% CASE constants.REL_CC %]
-Sledujete někoho kdo je uveden v kopii tohoto [% terms.bug2 %].
-    [% CASE constants.REL_VOTER %]
-Sledujete někoho kdo dal hlas tomuto [% terms.bug2 %].
-  [% END %]
+[% FOREACH reason = reasons_watch %]
+  [% reason_lines.push(watch_reason_descs.$reason)
+       IF watch_reason_descs.$reason %]
 [% END %]
+[%+ reason_lines.join("\n") %]

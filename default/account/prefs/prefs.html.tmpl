@@ -55,6 +55,8 @@
             { name => "permissions", label => "Oprávnění", 
               link => "userprefs.cgi?tab=permissions", saveable => "0" } ] %]
 
+[% Hook.process('tabs') %]
+
 [% FOREACH tab IN tabs %]
   [% IF tab.name == current_tab_name %]
     [% current_tab = tab %]
@@ -99,7 +101,7 @@
         <tr>
           <td width="150">&nbsp;</td>
           <td>
-            <input type="submit" id="update" value="Uložit změny">
+            <input type="submit" id="update" value="Uložit změny"">
           </td>
         </tr>
       </table>

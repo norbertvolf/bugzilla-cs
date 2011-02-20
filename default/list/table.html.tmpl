@@ -64,12 +64,15 @@
     "product"           => { maxlength => 8 } , 
     "version"           => { maxlength => 5 , title => "Verz" } , 
     "op_sys"            => { maxlength => 4 } , 
+    "bug_file_loc"      => { maxlength => 30 } , 
     "target_milestone"  => { title => "Milník" } , 
     "percentage_complete" => { format_value => "%d %%" } , 
   }
 %]
 
 [% PROCESS bug/time.html.tmpl %]
+
+[% Hook.process("before_table") %]
 
 [%############################################################################%]
 [%# Table Header                                                             #%]
@@ -167,7 +170,7 @@
 [% FOREACH bug = bugs %]
   [% count = loop.count() %]
 
-  <tr class="bz_bugitem
+  <tr id="b[% bug.bug_id %]" class="bz_bugitem
              bz_[% bug.bug_severity FILTER css_class_quote -%]
              bz_[% bug.priority FILTER css_class_quote -%]
              bz_[% bug.bug_status FILTER css_class_quote -%]
@@ -183,8 +186,7 @@
     </td>
     [% END %]
     <td class="first-child bz_id_column">
-      <a name="b[% bug.bug_id %]"
-         href="show_bug.cgi?id=[% bug.bug_id %]">[% bug.bug_id %]</a>
+      <a href="show_bug.cgi?id=[% bug.bug_id %]">[% bug.bug_id %]</a>
       <span style="display: none">[%+ '[SEC]' IF bug.secure_mode %]</span>
     </td>
 
@@ -205,7 +207,10 @@
         [% SET login_column = column.remove('_realname$') %]
         [% bug.${login_column}.truncate(abbrev.$column.maxlength, 
                                         abbrev.$column.ellipsis) FILTER html %]
-
+      [% ELSIF column == 'short_desc' || column == "short_short_desc" %]
+        <a href="show_bug.cgi?id=[% bug.bug_id FILTER html %]">
+          [%- bug.$column.truncate(abbrev.$column.maxlength, abbrev.$column.ellipsis) FILTER html -%]
+        </a>
       [% ELSE %]
         [%- display_value(column, bug.$column).truncate(abbrev.$column.maxlength, abbrev.$column.ellipsis) FILTER html -%]
       [% END %]
@@ -238,7 +243,7 @@
             column == 'percentage_complete' %]
         [% IF columns_to_span > 0 %]
           <td class="bz_total bz_total_label" colspan="
-              [%- columns_to_span FILTER html %]"><b>Summy</b></td>
+              [%- columns_to_span FILTER html %]"><b>Celkem</b></td>
           [% columns_to_span = 0 %]
         [% END %]
         [% IF column == 'percentage_complete' %]

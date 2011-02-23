@@ -1,0 +1,285 @@
+[%# The contents of this file are subject to the Mozilla Public
+  # License Version 1.1 (the "License"); you may not use this file
+  # except in compliance with the License. You may obtain a copy of
+  # the License at http://www.mozilla.org/MPL/
+  #
+  # Software distributed under the License is distributed on an "AS
+  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+  # implied. See the License for the specific language governing
+  # rights and limitations under the License.
+  #
+  # The Original Code is the Bugzilla Bug Tracking System.
+  #
+  # The Initial Developer of the Original Code is Netscape Communications
+  # Corporation. Portions created by Netscape are
+  # Copyright (C) 1998 Netscape Communications Corporation. All
+  # Rights Reserved.
+  #
+  # Contributor(s): Gervase Markham <gerv@gerv.net>
+  #                 Myk Melez <myk@mozilla.org>
+  #                 Shane H. W. Travis <travis@sedsystems.ca>
+  #%]
+
+[%# INTERFACE:
+  # watchedusers: string.
+  #               Comma-separated list of email addresses this user watches.
+  # watchers:     array.
+  #               Array of users watching this user's account.
+  # excludeself:  boolean.
+  #               True if user is not receiving self-generated mail.
+  # <rolename>:   Multiple hashes, one for each rolename (e.g. assignee; see
+  #               below), keyed by reasonname (e.g. comments; again, see
+  #               below). The value is a boolean - true if the user is
+  #               receiving mail for that reason when in that role.
+  #%]
+
+[% PROCESS global/variables.none.tmpl %]
+
+<p>
+  Pokud nerad dostáváte oznámení o "triviálních" změnách
+  požadavku, můžeš použít nastavení viz níže k odfiltrování zbytečných oznámení.
+</p>
+
+<script type="text/javascript">
+<!--
+function SetCheckboxes(setting) {
+  for (var count = 0; count < document.userprefsform.elements.length; count++) {
+    var theinput = document.userprefsform.elements[count];
+    if (theinput.type == "checkbox" && !theinput.disabled) {
+      if (theinput.name.match("neg")) {
+        theinput.checked = false;
+      }
+      else {
+        theinput.checked = setting;
+      }
+    }
+  }
+}
+
+document.write('<input type="button" value="Povolit všechny e-maily" onclick="SetCheckboxes(true); return false;">\n');
+document.write('<input type="button" value="Zakázat všechny e-maily" onclick="SetCheckboxes(false); return false;">\n');
+// -->
+</script>
+
+<hr>
+
+<table>
+  <tr>
+    <td colspan="2">
+      <b>Obecné volby:</b>
+    </td>
+  </tr>
+
+  <tr>
+    <td width="150"></td>
+    <td>
+      [% prefname = "email-$constants.REL_ANY-$constants.EVT_FLAG_REQUESTED" %]
+      <input type="checkbox" name="[% prefname %]" id="[% prefname %]" 
+        value="1"
+        [% " checked"
+           IF user.mail_settings.${constants.REL_ANY}.${constants.EVT_FLAG_REQUESTED} %]>
+      <label for="[% prefname %]">Pošli mi e-mail když mě někdo zažádá o nastavení příznaku</label>
+      <br>
+    </td>
+  </tr>
+  <tr>
+    <td width="150"></td>
+    <td>
+      [% prefname = "email-$constants.REL_ANY-$constants.EVT_REQUESTED_FLAG" %]
+      <input type="checkbox" name="[% prefname %]" id="[% prefname %]" 
+        value="1"
+        [% " checked"
+           IF user.mail_settings.${constants.REL_ANY}.${constants.EVT_REQUESTED_FLAG} %]>
+      <label for="[% prefname %]">Pošli mi e-mail když někdo nastaví příznak, o který jsem požádal</label>
+      <br>
+    </td>
+  </tr>
+[% IF user.is_global_watcher %]
+  <tr>
+    <td width="150"></td>
+    <td>
+      Dozorujete všechny [% terms.bugs %]. Tuto roli vám může
+      odebrat 
+      <a href="mailto:[% Param("maintainer") %]">[% Param("maintainer") %]</a>.
+    </td>
+  </tr>
+[% END %]
+</table>
+
+<hr>
+<b>Volby specifické pro pole/příjemce:</b>
+<br>
+<br>
+
+[% events = [
+    { id = constants.EVT_ADDED_REMOVED,
+      description = "Jsem přidán nebo odstraněn z této funkce" },
+    { id = constants.EVT_BUG_CREATED,
+      description = "Je vytvořen nový požadavek" },
+    { id = constants.EVT_OPENED_CLOSED,
+      description = "Je požadavek vyřešen nebo znovuotevřen" },
+    { id = constants.EVT_PROJ_MANAGEMENT,
+      description = "Se změní priorita, stav, závažnost nebo mezník" },
+    { id = constants.EVT_COMMENT,
+      description = "Je přidán nový komentář" },
+    { id = constants.EVT_ATTACHMENT,
+      description = "Je přidána nová příloha" },
+    { id = constants.EVT_ATTACHMENT_DATA,
+      description = "Se změní nějaká data přílohy" },
+    { id = constants.EVT_KEYWORD,
+      description = "Se změní klíčová slova" },
+    { id = constants.EVT_CC,
+      description = "Se změní pole 'V kopii'" },
+    { id = constants.EVT_DEPEND_BLOCK,
+      description = "Se změní strom závislostí" },
+    { id = constants.EVT_OTHER,
+      description = "Jakékoliv další pole, které nebylo zmíněno nahoře" },
+] %]
+
+[% neg_events = [
+    { id = constants.EVT_UNCONFIRMED,
+      description = "Je požadavek ve stavu 'Nepotvrzený'" },
+    { id = constants.EVT_CHANGED_BY_ME,
+      description = "Byl požadavek změněn mnou" },
+] %]
+
+[% relationships = [
+    { id = constants.REL_ASSIGNEE,
+      description = "Příjemce" },
+    { id = constants.REL_REPORTER,
+      description = "Oznamovatel" },
+    { id = constants.REL_CC,
+      description = "V Kopii" },
+] %]
+
+[% IF Param('useqacontact') %]
+  [% relationships.push({ id = constants.REL_QA, 
+                          description = "QA kontakt" }) %]
+[% END %]
+
+
+[%# This is up here so that the "relationships" hook can modify it. %]
+[% no_added_removed = [constants.REL_REPORTER] %]
+
+[% Hook.process('relationships') %]
+
+[% num_columns = relationships.size %]
+
+<table class="bz_emailprefs" border="1">
+  <tr>
+    <td colspan="[% num_columns FILTER html %]" align="center" width="50%">
+      <b>Když je můj vztah k požadavku:</b>
+    </td>
+    <td rowspan="2" width="40%">
+      <b>Chci dostávat e-maily když:</b>
+    </td>
+  </tr>
+
+  <tr>
+    [% FOREACH relationship = relationships %]
+      <th align="center" width="9%">
+        [% relationship.description FILTER html %]
+      </th>
+    [% END %]
+  </tr>
+  
+  [% FOREACH event = events %]  
+    [% count = loop.count() %]
+    <tr class="bz_row_[% count % 2 == 1 ? "odd" : "even" %]">
+      [% FOREACH relationship = relationships %]
+        <td align="center">
+          <input type="checkbox" 
+            name="email-[% relationship.id %]-[% event.id %]"
+            value="1"
+            [%# The combinations don't always make sense; disable a couple %]
+            [% IF event.id == constants.EVT_ADDED_REMOVED AND 
+                  no_added_removed.contains(relationship.id) 
+            %]
+               disabled
+            [% ELSIF user.mail_settings.${relationship.id}.${event.id} %]
+               checked
+            [% END %]>
+        </td>
+      [% END %]
+      <td>
+        [% event.description FILTER html %]
+      </td>
+    </tr>
+  [% END %]
+  
+  <tr>
+    <td colspan="[% num_columns FILTER html %]" 
+        align="center" width="50%">
+      &nbsp;
+    </td>
+    <td width="40%">
+      <b>ale ne když (přepíše nastavení viz výše):</b>
+    </td>
+  </tr>
+
+  [% FOREACH event = neg_events %]  
+    [% count = loop.count() %]
+    <tr class="bz_row_[% count % 2 == 1 ? "odd" : "even" %]">
+      [% FOREACH relationship = relationships %]
+        <td align="center">
+          <input type="checkbox" 
+            name="neg-email-[% relationship.id %]-[% event.id %]"
+            value="1"
+            [% " checked" IF NOT user.mail_settings.${relationship.id}.${event.id} %]>
+        </td>
+      [% END %]
+      <td>
+        [% event.description FILTER html %]
+      </td>
+    </tr>
+  [% END %]
+  
+</table>
+
+<hr>
+<b>Sledování uživatelů</b>
+
+<p>
+Při sledování uživatele budete dostávat všechny e-maily, které dostává on.
+</p>
+
+<p>
+[% IF watchedusers.size %]
+Momentálně sledujete tyto uživatele:
+  </p>
+  <p>
+    <select id="watched_by_you" name="watched_by_you" multiple="multiple" size="5">
+        [% FOREACH w = watchedusers %]
+           <option value="[% w FILTER html %]">[% w FILTER html %]</option>
+        [% END %]
+    </select> <br />
+    <input type="checkbox" id="remove_watched_users" name="remove_watched_users">
+    <label for="remove_watched_users">Remove selected users from my watch list</label>
+[% ELSE %]
+Momentálně nesledujete zádné uživatele.
+[% END %]
+</p>
+
+<p id="new_watched_by_you">Přidat uživatele do seznamu sledovaných uživatelů (seznam oddělený čárkami):
+  [% INCLUDE global/userselect.html.tmpl
+     id => "new_watchedusers"
+     name => "new_watchedusers"
+     value => ""
+     size => 60
+     multiple => 5
+  %]
+</p>            
+
+<p id="watching_you">Uživatelé, kteří sledují vás:<br>
+  [% IF watchers.size %]
+    [% FOREACH watcher = watchers %]
+      [% watcher FILTER html %] <br>
+    [% END %]
+  [% ELSE %]
+    <i>Nikdo</i>
+  [% END %]
+</p>
+
+<hr>
+
+<br>

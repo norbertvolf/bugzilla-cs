@@ -1202,12 +1202,12 @@
     You didn't define any axes to plot.
 
   [% ELSIF error == "no_bugs_chosen" %]
-    [% title = BLOCK %]No [% terms.Bugs %] Selected[% END %]
-    You apparently didn't choose any [% terms.bugs %]
+    [% title = BLOCK %]Žádné [% terms.bugs %] nebyly vybrány[% END %]
+    Zřejmě jste nevybral žádné [% terms.bugs %]
     [% IF action == "modify" %]
-      to modify.
+      pro úpravu.
     [% ELSIF action == "view" %]
-      to view.
+      pro zobrazení.
     [% END %]
 
   [% ELSIF error == "no_bug_ids" %]

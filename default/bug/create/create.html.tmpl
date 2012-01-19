@@ -156,7 +156,7 @@ var status_comment_required = new Array();
     [% status.comment_required_on_change_from() ? 'true' : 'false' %]
 [% END %]
 
-TUI_alternates['expert_fields'] = 'Show Advanced Fields';
+TUI_alternates['expert_fields'] = 'Rozšířené zobrazení';
 // Hide the Advanced Fields by default, unless the user has a cookie
 // that specifies otherwise.
 TUI_hide_default('expert_fields');
@@ -681,7 +681,7 @@ TUI_hide_default('expert_fields');
   <tr>
     <th>&nbsp;</th>
     <td colspan="3">
-      <input type="submit" id="commit" value="Submit [% terms.Bug %]">
+      <input type="submit" id="commit" value="Uložit [% terms.Bug %]">
       &nbsp;&nbsp;&nbsp;&nbsp;
       <input type="submit" name="maketemplate" id="maketemplate"
              value="Zapamatovat hodnoty jako šablonu"

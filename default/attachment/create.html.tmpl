@@ -35,9 +35,15 @@
   subheader = subheader
   style_urls = [ 'skins/standard/attachment.css' ]
   yui = [ 'autocomplete' ]
-  javascript_urls = [ "js/attachment.js", 'js/field.js', "js/util.js" ]
+  javascript_urls = [ "js/attachment.js", 'js/field.js', "js/util.js", "js/TUI.js" ]
   doc_section = "attachments.html"
 %]
+
+<script type="text/javascript">
+<!--
+TUI_hide_default('attachment_text_field');
+-->
+</script>
 
 <form name="entryform" method="post" action="attachment.cgi"
       enctype="multipart/form-data"
@@ -75,7 +81,7 @@
           <em>Chcete-li přeposlat tento [% terms.bug %] na sebe,
               zaškrtněte toto políčko.</em><br>
           <input type="checkbox" id="takebug" name="takebug" value="1">
-          <label for="takebug">take [% terms.bug %]</label>
+          <label for="takebug">vezmi [% terms.bug %]</label>
           [% bug_statuses = [] %]
           [% FOREACH bug_status = bug.status.can_change_to %]
             [% NEXT IF bug_status.name == "UNCONFIRMED" 
@@ -83,9 +89,9 @@
             [% bug_statuses.push(bug_status) IF bug_status.is_open %]
           [% END %]
           [% IF bug_statuses.size %]
-            <label for="takebug">and set the [% terms.bug %] status to</label>
+            <label for="takebug">a nastav stav [% terms.bugu %] na</label>
             <select id="bug_status" name="bug_status">
-              <option value="[% bug.status.name FILTER html %]">[% display_value("bug_status", bug.status.name) FILTER html %] (current)</option>
+              <option value="[% bug.status.name FILTER html %]">[% display_value("bug_status", bug.status.name) FILTER html %] (aktuální)</option>
               [% FOREACH bug_status = bug_statuses %]
                 [% NEXT IF bug_status.id == bug.status.id %]
                 <option value="[% bug_status.name FILTER html %]">[% display_value("bug_status", bug_status.name) FILTER html %]</option>

@@ -25,11 +25,11 @@
 [% IF bottom_navigator == 1 %]
   <ul class="related_actions">
     <li><a href="show_bug.cgi?format=multiple&amp;id=
-                [% bug.bug_id FILTER url_quote %]">Formátovat pro tisk</a></li>
+                [% bug.bug_id FILTER uri %]">Formátovat pro tisk</a></li>
     <li>&nbsp;-&nbsp;<a href="show_bug.cgi?ctype=xml&amp;id=
-                        [% bug.bug_id  FILTER url_quote %]">XML</a></li>
+                        [% bug.bug_id  FILTER uri %]">XML</a></li>
     <li>&nbsp;-&nbsp;<a href="enter_bug.cgi?cloned_bug_id=
-                        [% bug.bug_id  FILTER url_quote %]">Naklonovat 
+                        [% bug.bug_id  FILTER uri %]">Naklonovat 
                         [% terms.Bug %]</a></li>
     [%# Links to more things users can do with this bug. %]
     [% Hook.process("links") %]
@@ -43,22 +43,22 @@
 [% IF my_search %]
   [% SET last_bug_list = my_search.bug_list %]
   [% SET this_bug_idx = lsearch(last_bug_list, bug.id) %]
-  <b>Seznam [% terms.bugsu %]:</b>
+  <b>Seznam [% terms.Bug %]:</b>
 
   ([% this_bug_idx + 1 %] of [% last_bug_list.size %])
 
   <a href="show_bug.cgi?id=
-           [%- last_bug_list.first FILTER url_quote %]&amp;list_id=
-           [%- my_search.id FILTER url_quote %]">První</a>
+           [%- last_bug_list.first FILTER uri %]&amp;list_id=
+           [%- my_search.id FILTER uri %]">První</a>
   <a href="show_bug.cgi?id=
-           [%- last_bug_list.last FILTER url_quote %]&amp;list_id=
-           [%- my_search.id FILTER url_quote %]">Poslední</a>
+           [%- last_bug_list.last FILTER uri %]&amp;list_id=
+           [%- my_search.id FILTER uri %]">Poslední</a>
 
   [% IF this_bug_idx > 0 %]
     [% prev_bug = this_bug_idx - 1 %]
     <a href="show_bug.cgi?id=
-             [%- last_bug_list.$prev_bug FILTER url_quote %]&amp;list_id=
-             [%- my_search.id FILTER url_quote %]">Předchozí</a>
+             [%- last_bug_list.$prev_bug FILTER uri %]&amp;list_id=
+             [%- my_search.id FILTER uri %]">Předchozí</a>
   [% ELSE %]
     <i><font color="#777777">Předchozí</font></i>
   [% END %]
@@ -66,14 +66,14 @@
   [% IF this_bug_idx + 1 < last_bug_list.size %]
     [% next_bug = this_bug_idx + 1 %]
     <a href="show_bug.cgi?id=
-             [%- last_bug_list.$next_bug FILTER url_quote %]&amp;list_id=
-             [%- my_search.id FILTER url_quote %]">Další</a>
+             [%- last_bug_list.$next_bug FILTER uri %]&amp;list_id=
+             [%- my_search.id FILTER uri %]">Další</a>
   [% ELSE %]
     <i><font color="#777777">Další</font></i>
   [% END %]
 
   &nbsp;&nbsp;<a href="buglist.cgi?regetlastlist=
-              [%- my_search.id FILTER url_quote %]">Zobrazit výsledky posledního hledání</a>
+              [%- my_search.id FILTER uri %]">Zobrazit výsledky posledního hledání</a>
 [% ELSE %]
   [%# With no list, don't show link to search results %]
   <i><font color="#777777">První</font></i>
@@ -81,7 +81,7 @@
   <i><font color="#777777">Předchozí</font></i>
   <i><font color="#777777">Další</font></i>
   &nbsp;&nbsp;
-  <i><font color="#777777">Výsledky hledání nejsou dostupné
-    </font></i>
+  <i><font color="#777777">Tento požadavek není ve Vašich posledních
+    výsledcích vyhledávání.</font></i>
 [% END %]
 </div>

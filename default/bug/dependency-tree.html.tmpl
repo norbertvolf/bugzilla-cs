@@ -62,16 +62,16 @@
     [% IF type == 1 %]
         [% tree_name = "dependson_tree" %]
         [% IF ids.size %]
-            závisí na 
+            závisí na
         [% ELSE %]
-            nezávisí na žádném [% terms.bugu %]
+            nezávisí na žádném [% 'otevřeném ' IF hide_resolved %][% terms.bugu %].
         [% END %]
     [% ELSIF type == 2 %]
         [% tree_name = "blocked_tree" %]
         [% IF ids.size %] 
-            blokuje 
+            blokuje
         [% ELSE %]
-            neblokuje žádný [% terms.bug2 %]
+            neblokuje žádný [% 'otevřený ' IF hide_resolved %][% terms.bug %].
         [% END %]
     [% END %]
     [% IF ids.size %]
@@ -144,7 +144,7 @@
       <span class="summ_text">[%+ bug.short_desc FILTER html %]</span>
       <span class="summ_info">[[% INCLUDE buginfo %]]</span>
     </a>
-    <a href="showdependencytree.cgi?id=[% bugid FILTER url_quote %]"
+    <a href="showdependencytree.cgi?id=[% bugid FILTER uri %]"
        class="tree_link">
       <img src="skins/standard/dependency-tree/tree.png"
            title="Zobraz strom závislostí pro tento [% terms.bug2 %] [%+ bugid FILTER html %]">
@@ -176,7 +176,7 @@
      [% END %]
      <input type="hidden" name="hide_resolved" value="[% hide_resolved ? 0 : 1 %]">
      <input type="submit" id="toggle_visibility"
-            value="[% IF hide_resolved %]Show[% ELSE %]Hide[% END %] Resolved">
+            value="[% IF hide_resolved %]Ukázat[% ELSE %]Skrýt[% END %] vyřešené">
    </form>
    </td>
 
@@ -256,7 +256,7 @@
      <input name="id" type="hidden" value="[% bugid %]">
      <input name="hide_resolved" type="hidden" value="[% hide_resolved %]">
      <input type="submit" id="remove_limit"
-       value="&nbsp;Unlimited&nbsp;"
+       value="&nbsp;Neomezeně&nbsp;"
        [% "disabled" IF maxdepth == 0 || maxdepth == realdepth %]>
    </form>
    </td>

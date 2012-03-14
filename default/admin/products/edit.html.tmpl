@@ -45,7 +45,7 @@
 
     <tr>
       <th align="right" valign="top">
-        <a href="editcomponents.cgi?product=[% product.name FILTER url_quote %]">
+        <a href="editcomponents.cgi?product=[% product.name FILTER uri %]">
         Upravit komponenty:
         </a>
       </th>
@@ -67,8 +67,8 @@
     </tr>
     <tr>
       <th align="right" valign="top">
-        <a href="editversions.cgi?product=[% product.name FILTER url_quote %]">Upravit
-verze:</a>
+        <a href="editversions.cgi?product=[% product.name FILTER uri %]">Upravit
+ verze:</a>
       </th>
       <td>
         [%- IF product.versions.size -%]
@@ -84,8 +84,8 @@ verze:</a>
     [% IF Param('usetargetmilestone') %]
       <tr>
         <th align="right" valign="top">
-          <a href="editmilestones.cgi?product=[% product.name FILTER url_quote %]">
-          Upravit cílové verze:</a>
+          <a href="editmilestones.cgi?product=[% product.name FILTER uri %]">
+          Upravit milníky/cílové verze:</a>
         </th>
         <td>
           [%- IF product.milestones.size -%]
@@ -102,7 +102,7 @@ verze:</a>
     <tr>
       <th align="right" valign="top">
         <a href="editproducts.cgi?action=editgroupcontrols&product=
-          [%- product.name FILTER url_quote %]">
+          [%- product.name FILTER uri %]">
           Upravit přístupy skupin:
         </a>
       </th>
@@ -129,8 +129,8 @@ verze:</a>
       </td>
     </tr>
     <tr>
-      <th align="right">[% terms.Bugsu %]:</th>
-      <td><a href="buglist.cgi?product=[% product.name FILTER url_quote %]">
+      <th align="right">[% terms.Bugs %]:</th>
+      <td><a href="buglist.cgi?product=[% product.name FILTER uri %]">
             [% product.bug_count FILTER html %]</a></td>
     </tr>
   </table>
@@ -139,7 +139,7 @@ verze:</a>
         value="[% product.name FILTER html %]">
   <input type="hidden" name="action" value="update">
   <input type="hidden" name="token" value="[% token FILTER html %]">
-  <input type="submit" name="submit" value="Uložit změny">
+  <input type="submit" id="update-product" value="Uložit změny">
 </form>
   
 [% PROCESS "admin/products/footer.html.tmpl"

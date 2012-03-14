@@ -21,7 +21,6 @@
 [%# INTERFACE:
   # bug_id: integer. The number of the bug(s).
   # multiple_bugs: boolean. True if bug_id contains > 1 bug number.
-  # doall: boolean. True if we are displaying every bug in the database.
   # showsummary: boolean. True if we are showing bug summaries.
   # rankdir: string. "TB" if we are ranking top-to-bottom,
                      "LR" if left-to-right.
@@ -37,10 +36,10 @@
    header = title
  %]
 
-[% IF NOT multiple_bugs AND NOT doall %]
+[% IF NOT multiple_bugs %]
   [% filtered_desc = short_desc FILTER html %]
-  [% title = "$title pro $terms.bug2 $bug_id"
-     header = "$header pro $terms.bug2 <a href=\"show_bug.cgi?id=$bug_id\">$bug_id</a>"
+  [% title = "$title for $terms.bug $bug_id"
+     header = "$header for $terms.bug <a href=\"show_bug.cgi?id=$bug_id\">$bug_id</a>"
      subheader = filtered_desc
    %]
 [% END %]
@@ -75,15 +74,13 @@
     </tr>
 
     <tr>
-      <th align="left"><label for="display">Display:</label></th>
+      <th align="left"><label for="display">Zobraz:</label></th>
       <td colspan="2">
         <select id="display" name="display">
           <option value="tree"[% 'selected="selected"' IF (!display || display == "tree") %]>
             Omez na požadavky v přímém vztahu k zadaným požadavkům</option>
           <option value="web" [% 'selected="selected"' IF display == "web" %]>
             Zobraz všechny požadavky mající nějaký vztah k zadaným požadavkům</option>
-          <option value="doall" [% 'selected="selected"' IF display == "doall" %]>
-            Zobraz každý [% terms.bug2 %] v systému se závislostmi</option>
         </select>
       </td>
     </tr>
@@ -92,7 +89,7 @@
       <th align="left"><label for="rankdir">Orientace:</label></th>
       <td colspan="2">
         <select id="rankdir" name="rankdir">
-          <option value="TB"[% " selected" IF rankdir == "TB" %]>Zeshora dolů</option>
+          <option value="TB"[% " selected" IF rankdir == "TB" %]>Zhora dolů</option>
           <option value="BT"[% " selected" IF rankdir == "BT" %]>Zdola nahoru</option>
           <option value="LR"[% " selected" IF rankdir == "LR" %]>Zleva doprava</option>
           <option value="RL"[% " selected" IF rankdir == "RL" %]>Zprava doleva</option>

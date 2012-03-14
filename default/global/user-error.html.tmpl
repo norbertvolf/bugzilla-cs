@@ -50,13 +50,15 @@
     [% title = "Vytváření účtů zablokováno" %]
     Vytváření uživatelských účtů bylo zakázáno.
     <hr>
-    Nové účty mohou být vytvořeny administrátorem. Správcem je [% Param("maintainer") %].
+    Nové účty mohou být vytvořeny administrátorem. 
+    Správcem je [% Param("maintainer") %].
 
   [% ELSIF error == "account_creation_restricted" %]
     [% title = "Vytváření účtů omezeno" %]
     Vytváření uživatelských účtů bylo omezeno.
     <hr>
     Kontaktuj administrátora nebo správce
+    Contact your administrator or the maintainer
     ([% Param("maintainer") %]) pro informace ohledně vytváření nových účtů.
 
   [% ELSIF error == "account_disabled" %]
@@ -70,16 +72,16 @@
     [% title = "Účet již existuje" %]
     Účet s 
     [% IF email %]
-      přihlašovacím jménem [% email FILTER html %].
+      přihlašovacím jménem [% email FILTER html %] 
     [% ELSE %]
-      přihlašovacím jménem.
+      přihlašovacím jménem 
     [% END %]
-    již existuje
+    již existuje.
 
   [% ELSIF error == "account_locked" %]
     [% title = "Účet uzamknut" %]
     Vaše IP adresa ([% ip_addr FILTER html %]) byla pro přístup k tomuto účtu zablokována
-	[% unlock_at FILTER time %], protože jste překročil maximální počet pokusů o přihlášení.
+    do [% unlock_at FILTER time %], protože jste překročil maximální počet pokusů o přihlášení.
 
   [% ELSIF error == "alias_has_comma_or_space" %]
     [% title = "Neplatné znaky v aliasu" %]
@@ -87,11 +89,11 @@
     obsahuje jednu nebo více čárek nebo mezer. Aliasy nemohou obsahovat
     čárky nebo mezery protože tyto znaky jsou použity pro oddělení
     aliasů od sebe (např. v seznamech). Prosím vyberte si jiný alias
-    , který neobsahuje čárky nebo mezery.
+    ,který neobsahuje čárky nebo mezery.
 
   [% ELSIF error == "alias_in_use" %]
-    [% title = "Alias již použita" %]
-    [% terms.Bug %] [%+ bug_id FILTER bug_link(bug_id) FILTER none %]
+    [% title = "Alias je již použit" %]
+    Požadavek [%+ bug_id FILTER bug_link(bug_id) FILTER none %]
     bylo již použito jako alias <em>[% alias FILTER html %]</em>.
     Prosím vyberte jiný.
 
@@ -104,8 +106,13 @@
 
   [% ELSIF error == "alias_too_long" %]
     [% title = "Alias příliš dlouhý" %]
-    Aliasy požadavky nemohou být delší než 20 znaků.
+    Alias požadavku nemůže být delší než 20 znaků.
     Prosím vyberte alias s kratším názvem.
+
+  [% ELSIF error == "attachment_bug_id_mismatch" %]
+    [% title = "Neplatná příloha" %]
+    Pokusil jste se provést akci s přílohou z jiného požadavku.
+    Tato operace vyžaduje, aby všechny přílohy patřily stejnému požadavku.
 
   [% ELSIF error == "auth_cant_create_account" %]
     [% title = "Nelze vytvářet účty" %]
@@ -115,7 +122,7 @@
   [% ELSIF error == "auth_failure" %]
     [% title = "Autorizace vyžadována" %]
     [% admindocslinks = {'groups.html' => 'Group Security'} %]
-    Omlouváme se,
+    Omlouvame se,
     [% IF group %]
       nejste členem skupiny '[% group FILTER html %]',
     [% END %]
@@ -125,7 +132,7 @@
       [% IF reason == "cant_bless" %]
         nemáte právo přidat nebo odstranit uživatele ze skupiny,
       [% ELSIF reason == "not_visible" %]
-        jsou přítomna omezení zoobrazení v jisté skupině uživatelů,
+        jsou přítomna omezení zobrazení v jisté skupině uživatelů,
       [% END %]
     [% END %]
 
@@ -146,6 +153,8 @@
       spuštění
     [% ELSIF action == "schedule" %]
       naplánování
+    [% ELSIF action == "search" %]
+      vyhledávání
     [% ELSIF action == "use" %]
       použití
     [% ELSIF action == "approve" %]
@@ -163,7 +172,9 @@
         tato příloha
       [% END %]
     [% ELSIF object == "bugs" %]
-      [%+ terms.bugs %]
+      požadavky
+    [% ELSIF object == "bug_fields" %]
+      pole [% field_descs.$field FILTER html %] 
     [% ELSIF object == "charts" %]
       funkce "Nové grafy"
     [% ELSIF object == "classifications" %]
@@ -199,18 +210,20 @@
     [% ELSIF object == "settings" %]
       nastavení
     [% ELSIF object == "sudo_session" %]
-      sudo sezení
+      superuživatelských sezení
     [% ELSIF object == "timetracking_summaries" %]
-      souhrné reporty sledování času
+      souhrnných reporty sledování času
     [% ELSIF object == "user" %]  
       uživatel [% IF userid %] s identifikátorem '[% userid FILTER html %]'
       [% ELSE %]kterého jste specifikoval [% END %]
     [% ELSIF object == "users" %]
-      uživatelé
+      uživatelů
     [% ELSIF object == "versions" %]
-      verze
+      verzí
     [% ELSIF object == "workflow" %]
-      styl práce
+      stylů práce/procesů 
+    [% ELSE %]
+      [%+ Hook.process('auth_failure_object') %]
     [% END %].
 
     [% Hook.process("auth_failure") %]
@@ -218,11 +231,6 @@
   [% ELSIF error == "attachment_deletion_disabled" %]
     [% title = "Mazání příloh zakázáno" %]
     V této instalaci je zakázáno mazání příloh.
-
-  [% ELSIF error == "attachment_illegal_url" %]
-    [% title = "Nepovolené URL přílohy" %]
-    <em>[% url FILTER html %]</em> není povolené URL pro přílohy.
-    Musí začínat buď http://, https:// nebo ftp://.
 
   [% ELSIF error == "attachment_removed" %]
     [% title = "Příloha odstraněna" %]
@@ -239,7 +247,7 @@
     Nejste autorizován k zobrazení požadavku #[% bug_id FILTER html %].
     Pokud chcete požadavek zobrazit, musíte se
     nejdříve <a href="show_bug.cgi?id=
-                   [% bug_id FILTER url_quote %]&amp;GoAheadAndLogIn=1">přihlásit
+                   [% bug_id FILTER uri %]&amp;GoAheadAndLogIn=1">přihlásit 
     do svého účtu</a> odpovídajícími oprávněními.
 
   [% ELSIF error == "bug_url_invalid" %]
@@ -252,10 +260,14 @@
     [% ELSIF reason == 'show_bug' %]
       [%+ field_descs.see_also FILTER html %] URL by měly odkazovat na jedno z tohoto:
       <ul>
-        <li><code>show_bug.cgi</code>Instalace Bugzilly.</li>
+        <li><code>show_bug.cgi</code> Instalace Bugzilly.</li>
         <li>Požadavek na launchpad.net</li>
         <li>Téma na code.google.com.</li>
-        <li>požadavek na b[% %]ugs.debian.org.</li>
+        <li>Požadavek na bugs.debian.org.</li>
+        <li>Problém v JIRA instalaci.</li>
+        <li>Tiket v Trac instalaci.</li>
+        <li>Požadavek v MantisBT instalaci.</li>
+        <li>Požadavek na sourceforge.net.</li>
       </ul>
     [% ELSIF reason == 'id' %]
       Na tomto URL se nenachází žádný platný požadavek.
@@ -271,7 +283,11 @@
     [% title = "Vyžadovány parametry" %]
     [% docslinks = {'query.html' => "Hledání požadavků",
                     'query.html#list' => "Seznamy požadavků"} %]
-    Nemůžete vyhledávat, nebo vytvářet uložená hledání bez zadání parametrů vyhledávání.
+    Nemůžete vyhledávat, nebo vytvářet uložená hledání bez vložení parametrů vyhledávání.
+
+  [% ELSIF error == "cc_remove_denied" %]
+    [% title = "Změna zakázána" %]
+    Nemáte oprávnění odstranit ostatní osoby ze seznamu kopií.
 
   [% ELSIF error == "chart_too_large" %]
     [% title = "Graf je příliš velký" %]
@@ -307,7 +323,7 @@
   [% ELSIF error == "auth_classification_not_enabled" %]
     [% title = "Klasifikace není povolena" %]
     Omlouváme se, klasifikace není povolena.
-
+    
   [% ELSIF error == "classification_name_too_long" %]
     [% title = "Název klasifikace je příliš dlouhé" %]
     Název klasifikace je limitován na [% constants.MAX_CLASSIFICATION_SIZE FILTER html %]
@@ -331,9 +347,9 @@
     Nemůžete smazat výchozí klasifikaci
 
   [% ELSIF error == "classification_has_products" %]
-     Omlouváme se, pro tuto klasifikaci jsou přítomny produkty.
-	 Tyto produkty musíte přiřadit jiné klasifikace před
-     smazáním této klasifikace.
+    Omlouváme se, pro tuto klasifikaci jsou přítomny produkty.
+    Tyto produkty musíte přiřadit jiné klasifikace před
+    smazáním této klasifikace.
 
   [% ELSIF error == "component_already_exists" %]
     [% title = "Komponenta již existuje" %]
@@ -349,15 +365,15 @@
     Musíte zvolit název pro tuto komponentu.
 
   [% ELSIF error == "component_has_bugs" %]
-    [% title = BLOCK %]Komponenta obsahue požadavky[% END %]
-    Tato komponenta obsahuje požadavky!
+    [% title = BLOCK %]Komponenta obsahuje požadavky[% END %]
+    Tato komponenta obsahuje požadavky([% nb FILTER html %])!
     Tyto požadavky musíte přiřadit jiné komponentě před
-    jejím smazáním.
+    smazáním této komponenty.
 
   [% ELSIF error == "component_name_too_long" %]
     [% title = "Název komponenty je příliš dlouhý" %]
     Název komponenty je limitován na [% constants.MAX_COMPONENT_SIZE FILTER html %]
-    znaků. '[% name FILTER html %]' má příliš mnoho ([% name.length %] znaků).
+    znaků. '[% name FILTER html %]' má příliš mnoho ([% name.length %]) znaků.
 
   [% ELSIF error == "component_need_initialowner" %]
     [% title = "Komponenta vyžaduje výchozího příjemce" %]
@@ -398,7 +414,7 @@
 
   [% ELSIF error == "dupe_id_required" %]
     [% title = "ID duplikovaného požadavku musí být vyplněno" %]
-    Musíte specifikovat id požadavku, pro který je tento požadavek duplikátem.
+    Musíte specifikovat ID požadavku, pro který je tento požadavek duplikátem.
 
   [% ELSIF error == "dupe_not_allowed" %]
     [% title = "Není možno označit požadavky jako duplikáty" %]
@@ -412,7 +428,7 @@
     [% IF dupe_of == bug_id %]
       sebe sama
     [% ELSE %]
-      [%+ terms.bug %] [%+ dupe_of FILTER html %], protože by
+      požadavků [%+ dupe_of FILTER html %], protože by
       to vytvořilo smyčku mezi duplikáty
     [% END %].
 
@@ -425,8 +441,8 @@
     Potvrzení emailové adresy selhalo.
 
   [% ELSIF error == "email_no_text_plain" %]
-    Vaše zpráva neobsahuje žádný text. Bugzilla nepřijímá
-    emaily v HTML formátu.
+    Vaše zpráva neobsahuje žádný text. [% terms.Bugzilla %] nepřijímá
+    emaily v HTML formátu nebo HTML s přílohou.
 
   [% ELSIF error == "empty_group_description" %]
     [% title = "Popis skupiny nemůže být prázdný" %]
@@ -439,7 +455,7 @@
   [% ELSIF error == "entry_access_denied" %]
     [% title = "Oprávnění odmítnuto" %]
     [% admindocslinks = {'groups.html' => 'Group Security'} %]
-    Omlouváme se, produkt <em>[% product FILTER html %]</em>
+    Omlouváme se, produkt<em>[% product FILTER html %]</em>
     neexistuje nebo nejste autorizován
     vkládat do něj požadavky.
 
@@ -448,7 +464,7 @@
 
   [% ELSIF error == "extension_first_letter_caps" %]
     První písmeno názvu vašeho rozšíření musí být velké písmeno.
-    (Napsal jste '[% name FILTER html %]'.)
+    (Specifikoval jste '[% name FILTER html %]'.)
 
   [% ELSIF error == "field_already_exists" %]
     [% title = "Pole již existuje" %]
@@ -462,7 +478,7 @@
 
   [% ELSIF error == "field_control_must_be_select" %]
     [% title = "Neplatný typ pole" %]
-    Pouze rozevírací nebo vícepoložková pole mohou být použity pro ovládání
+    Pouze rozbalovací nebo vícepoložková pole mohou být použity pro ovládání
     viditelnosti/hodnot ostatních polí. [% field.description FILTER html %]
     není správný typ pole.
 
@@ -486,25 +502,30 @@
 
   [% ELSIF error == "field_value_control_select_only" %]
     [% title = "Neplatná hodnota řidícího pole" %]
-    Pouze rozevírací nebo vícepoložková pole mohou mít pole
+    Pouze rozbalovací nebo vícepoložková pole mohou mít pole
     ovládající jejich hodnoty.
 
+  [% ELSIF error == "field_visibility_values_must_be_selected" %]
+    [% title = "Chybějící hodnoty viditelnosti pole" %]
+    Nejméně jedna hodnota viditelnosti pole '[% field.name FILTER html %]'
+    musí být vybrána.
+
   [% ELSIF error == "fieldname_invalid" %]
-    [% title = "Uvedené pole neexistuje" %]
+    [% title = "Specifikované pole neexistuje" %]
     Pole '[% field.name FILTER html %]' neexistuje nebo
     nemůže být upraveno v tomto rozhraní.
 
   [% ELSIF error == "fieldvalue_already_exists" %]
     [% title = "Hodnota pole již existuje" %]
     Hodnota '[% value.name FILTER html %]' již existuje
-    [%+ field.description FILTER html %] v tomto poli.
+    v tomto poli - [%+ field.description FILTER html %].
 
   [% ELSIF error == "fieldvalue_is_controller" %]
     [% title = "Hodnota ovládá ostatní pole" %]
     Nemůžete smazat [% value.field.description FILTER html %]
     '[% value.name FILTER html %]' protože
     [% IF fields.size %]
-      it ovládá viditelnost následujících polí:
+      ovládá viditelnost následujících polí:
       [%+ fields.join(', ') FILTER html %].
     [% END %]
     [% ' Také, ' IF fields.size AND vals.size %]
@@ -521,18 +542,18 @@
     [% END %]
 
   [% ELSIF error == "fieldvalue_is_default" %]
-    [% title = "Uvedená hodnota pole je výchozí" %]
+    [% title = "Specifikovaná hodnota pole je výchozí" %]
     '[% value.name FILTER html %]' je výchozí hodnota pro
     pole '[% field.description FILTER html %]' a nemůže být smazána
-    nebo vypnuta.
+    nebo zakázána.
     [% IF user.in_group('tweakparams') %]
       Nejdříve musíte <a href="editparams.cgi?section=bugfields#
-      [%- param_name FILTER url_quote %]">změnit</a> výchozí hodnotu.
+      [%- param_name FILTER uri %]">změnit</a> výchozí hodnotu.
     [% END %]
 
   [% ELSIF error == "fieldvalue_name_too_long" %]
-    [% title = "Hodnota pole příliš velká" %]
-    Hodnota pole je limitována na 
+    [% title = "Hodnota pole je příliš velká" %]
+    Hodnota pole je limitována na
     [%+ constants.FIELD_VALUE_MAX_SIZE FILTER none %] znaků. 
     '[% value FILTER html %]' je příliš dlouhá ([% value.length %] znaků).
 
@@ -542,8 +563,8 @@
     zastává speciální roli pro pole '[% field.description FILTER html %]'.
 
   [% ELSIF error == "fieldvalue_not_deletable" %]
-    [% title = "Hodnota pole je nesmazatelná" %]
-    Hodnota '[% value.name FILTER html %]' nemůže být odstraněna nebo
+    [% title = "Hodnotu pole nelze smazat" %]
+    Hodnota '[% value.name FILTER html %]' nemůže být odstraněna ani
     zakázána protože zastává speciální roli pro pole 
     '[% field.description FILTER html %]'.
 
@@ -555,45 +576,48 @@
 
   [% ELSIF error == "fieldvalue_sortkey_invalid" %]
     [% title = "Neplatný řadicí klíč pole" %]
-    Řadicí klíč '[% sortkey FILTER html %]' pro 
+    Řadicí klíč '[% sortkey FILTER html %]' pro
     pole [%+ field.description FILTER html %] není platné
     (kladné) číslo.
 
   [% ELSIF error == "fieldvalue_still_has_bugs" %]
-    [% title = "Nemůžeš smazat hodnotu v tomto poli" %]
-    Nemůžeš smazat hodnotu '[% value.name FILTER html %]' pole 
-    [% field.description FILTER html %] , protože je použita ještě v
-    [%+ value.bug_count FILTER html %] požadavcích.
+    [% title = "Není možno smazat hodnotu v tomto poli" %]
+    Není možno smazat hodnotu '[% value.name FILTER html %]' pole
+    [%+ field.description FILTER html %], protože je použita ještě v
+    [%+ value.bug_count FILTER html %] požadavcích..
 
   [% ELSIF error == "fieldvalue_undefined" %]
     [% title = "Nedefinovaná hodnota není povolena" %]
-    Musíš specifikovat hodnotu.
+    Je nutno specifikovat hodnotu.
 
   [% ELSIF error == "file_not_specified" %]
     [% title = "Soubor nespecifikován" %]
-    Neuvedl jsi název souboru, který chces přiložit.
+    Nebyl specifikován soubor, který má být připojen.
+
+  [% ELSIF error == "filename_not_specified" %]
+    [% title = "Název souboru nespecifikován" %]
+    Nebyl specifikován název souboru, který má být připojen.
 
   [% ELSIF error == "file_too_large" %]
     [% title = "Soubor je příliš velký" %]
-    Soubor, který chceš přiložit má [% filesize FILTER html %] 
+    [%# Convert maxlocalattachment from Mb to Kb %]
+    [% max_local = Param('maxlocalattachment') * 1024 %]
+    [% max_limit = [Param('maxattachmentsize'), max_local] %]
+    Soubor, který se pokoušíte připojit má [% filesize FILTER html %]
     kilobytů (KB). Přílohy nemohou být větší než
-    [%+ Param('maxattachmentsize') %] KB. <br>
-    We recommend that you store your attachment elsewhere
-    [% IF Param("allow_attach_url") %]
-      and then specify the URL to this file on the attachment
-      creation page in the <b>AttachURL</b> field.
-    [% ELSE %]
-      and then insert the URL to it in a comment, or in the URL field
-      for this [% terms.bug %].
-    [% END %]
-    <br>Pokud je příloha obrázek, můžeš jej převést
-    např. do formátu JPG nebo PNG a zkusit ji vložit znovu.
+    [%# Hack to get the max value between both limits %]
+    [%+ max_limit.nsort.last FILTER html %] KB. <br>
+    Prosím uložte přílohu někam jinam a vložte URL odkaz
+    na ni do odpovídajícího pole na stránce vytváření příloh.
+    <br>Případně pokud je Vaše příloha obrázek, může pomoci
+    ji uložit v komprimovaném formátu (JPG,PNG...) a zkusit
+    přílohu připojit znova.
 
   [% ELSIF error == "flag_requestee_needs_privs" %]
     [% title = "Flag Requestee Needs Privileges" %]
-    [% requestee.identity FILTER html %] nemá povolení nastavit
-    <em>[% flagtype.name FILTER html %]</em> příznak. Prosím vyber uživatele, který je
-    členem skupiny <em>[% flagtype.grant_group.name FILTER html %]</em>.
+    [% requestee.identity FILTER html %] ************ does not have permission to set the
+    <em>[% flagtype.name FILTER html %]</em> flag. Please select a user who is
+    a member of the <em>[% flagtype.grant_group.name FILTER html %]</em> group.
 
   [% ELSIF error == "flag_requestee_unauthorized" %]
     [% title = "Flag Requestee Not Authorized" %]
@@ -602,30 +626,31 @@
     [% docslinks = {'flags-overview.html' => 'Přehled příznaků',
                     'flags.html' => 'Používání příznaků'} %]
 
-    You asked [% requestee.identity FILTER html %]
-    for <code>[% flag_type.name FILTER html %]</code> on [% terms.bug %] 
+    Žádal/a jste [% requestee.identity FILTER html %]
+    o <code>[% flag_type.name FILTER html %]</code> pro požadavek 
     [%+ bug_id FILTER html -%]
-    [% IF attach_id && attach_id > 0 %], attachment [% attach_id FILTER html %][% END %],
-    but that [% terms.bug %] has been restricted to users in certain groups, 
-    and the user you asked isn't in all the groups to which 
-    the [% terms.bug %] has been restricted.
-    Please choose someone else to ask, or make the [% terms.bug %] accessible
-    to users on its CC: list and add that user to the list.
+    [% IF attach_id && attach_id > 0 %], příloha [% attach_id FILTER html %][% END %],
+    ale tento požadavek byl omezen na uživatele v určitých skupinách,
+    a uživatel o kterého žádáte není zařazen ve všech skupinách,
+    na které byl požadavek omezen.
+    Prosím vyberte někoho jiného pro dotaz či zpřístupnění
+    uživatelům v seznamu kopií CC a přidání uživatele.
 
   [% ELSIF error == "flag_requestee_unauthorized_attachment" %]
-    [% title = "Flag Requestee Not Authorized" %]
+    [% title = "Žadatel příznaku nebyl autorizován" %]
     [% admindocslinks = {'flags-overview.html#flags-admin'  => 'Správa příznaků',
-                         'groups.html' => 'Group Security'} %]
+                         'groups.html' => 'Zabezpečení skupin'} %]
     [% docslinks = {'flags-overview.html' => 'Přehled příznaků',
                     'flags.html' => 'Používání příznaků'} %]
 
-    You asked [% requestee.identity FILTER html %]
-    for <code>[% flag_type.name FILTER html %]</code> on 
-    [%+ terms.bug %] [%+ bug_id FILTER html %],
-    attachment [% attach_id FILTER html %], but that attachment
-    is restricted to users in the [% Param("insidergroup") FILTER html %] group,
-    and the user you asked isn't in that group.  Please choose someone else
-    to ask, or ask an administrator to add the user to the group.
+    Žádal/a jste [% requestee.identity FILTER html %]
+    o <code>[% flag_type.name FILTER html %]</code> pro požadavek
+    [%+ bug_id FILTER html %],
+    příloha [% attach_id FILTER html %], ale tato příloha
+    byla omezen na uživatele v určitých skupinách ([% Param("insidergroup") FILTER html %]),
+    a uživatel o kterého žádáte tam není zařazen.
+    Prosím vyberte někoho jiného pro dotaz či požádejte administrátora
+    o přidání uživatele do skupiny.
 
   [% ELSIF error == "flag_status_invalid" %]
     [% title = "Neplatný stav příznaku" %]
@@ -635,31 +660,46 @@
     [% END %]
     není platný.
 
+  [% ELSIF error == "flag_type_cannot_deactivate" %]
+    [% title = "Nelze deaktivovat typ příznaku" %]
+    Bohužel typ '[% flagtype.name FILTER html %]' příznaku se vztahuje také
+    k produktům, které Vám nejsou zpřístupněny a proto jej nemůžete deaktivovat.
+
+  [% ELSIF error == "flag_type_cannot_delete" %]
+    [% title = "Nelze smazat typ příznaku" %]
+    Bohužel typ '[% flagtype.name FILTER html %]' příznaku se vztahuje také
+    k produktům, které Vám nejsou zpřístupněny a proto jej nemůžete smazat.
+
   [% ELSIF error == "flag_type_cc_list_invalid" %]
     [% title = "Flag Type CC List Invalid" %]
     [% admindocslinks = {'flags-overview.html#flags-admin'  => 'Správa příznaků'} %]
-    The CC list [% cc_list FILTER html %] must be less than 200 characters long.
+    Seznam kopií CC [% cc_list FILTER html %] musí být kratší než 200 znaků.
 
   [% ELSIF error == "flag_type_component_without_product" %]
-    [% title = "Produkt nevyplněn" %]
-    Byla vybrána komponenta bez vybraného produktu.
+    [% title = "Produkt nezvolen" %]
+    Byla vybrána komponenta aniž byl vybrán také produkt.
 
   [% ELSIF error == "flag_type_description_invalid" %]
-    [% title = "Popis typu příznaku není platný" %]
+    [% title = "Neplatný popis typu příznaku" %]
     [% admindocslinks = {'flags-overview.html#flags-admin'  => 'Správa příznaků'} %]
-    Popis musí být kratší než 32K.
+    Je třeba vložit popis pro tento typ příznaku.
 
   [% ELSIF error == "flag_type_name_invalid" %]
-    [% title = "Flag Type Name Invalid" %]
+    [% title = "Neplatné jméno typu příznaku" %]
     [% admindocslinks = {'flags-overview.html#flags-admin'  => 'Správa příznaků'} %]
-    The name <em>[% name FILTER html %]</em> must be 1-50 characters long
-    and must not contain any spaces or commas.
+    Jméno <em>[% name FILTER html %]</em> musí být 1-50 znaků dlouhé
+    a nesmí obsahovat mezery ani čárky.
+
+  [% ELSIF error == "flag_type_not_editable" %]
+    [% title = "Nelze editovat ty příznaku" %]
+    Nejste oprávněn editovat vlastnosti typu '[% flagtype.name FILTER html %]' příznaku,
+    protože tento příznak není přístupný pro produkty, které spravujete.
 
   [% ELSIF error == "flag_type_not_multiplicable" %]
     [% docslinks = {'flags-overview.html' => 'Přehled příznaků',
-                    'flags.html' => 'Používání příznaků'} %]
-    You cannot have several <em>[% type.name FILTER html %]</em> flags
-    for this [% IF attachment %] attachment [% ELSE %] [%+ terms.bug %] [% END %].
+                    'flags.html' => 'Použití příznaků'} %]
+    Nejste oprávněn mít několik <em>[% type.name FILTER html %]</em> příznaků
+    pro tento [% IF attachment %] attachment [% ELSE %] požadavek [% END %].
 
   [% ELSIF error == "flag_update_denied" %]
     [% title = "Úprava příznaku zamítnuta" %]
@@ -667,112 +707,98 @@
                          'groups.html' => 'Group Security'} %]
     [% docslinks = {'flags-overview.html' => 'Přehled příznaků',
                     'flags.html' => 'Používání příznaků'} %]
-    You tried to [% IF status == "+" %] grant [% ELSIF status == "-" %] deny
-    [% ELSIF status == "X" %] clear [% ELSE %] request [% END %]
+    Pokusil jste se [% IF status == "+" %] oprávnit [% ELSIF status == "-" %] odepřít
+    [% ELSIF status == "X" %] vyčistit [% ELSE %] žádat [% END %]
     <code>[% name FILTER html %]
           [% IF status == "X" %][% old_status FILTER html %][% END %]</code>.
 
-    Only a user with the required permissions may make this change.
+    Pouze uživatel s požadovanými oprávněními může udělat tuto změnu.
 
   [% ELSIF error == "format_not_found" %]
     [% title = "Formát nenalezen" %]
-    The requested format <em>[% format FILTER html %]</em> does not exist with
-    a content type of <em>[% ctype FILTER html %]</em>.
+    Požadovaný formát <em>[% format FILTER html %]</em> neexistuje
+    s typem obsahu <em>[% ctype FILTER html %]</em>.
     
   [% ELSIF error == "flag_type_sortkey_invalid" %]
-    [% title = "Flag Type Sort Key Invalid" %]
-    The sort key must be an integer between 0 and 32767 inclusive.
-    It cannot be <em>[% sortkey FILTER html %]</em>.
+    [% title = "Neplatný řadící klíč typu příznaku" %]
+    Řadící klíč  <em>[% sortkey FILTER html %]</em> musí být číslo
+    mezi 0 and [% constants.MAX_SMALLINT FILTER none %].
 
   [% ELSIF error == "freetext_too_long" %]
-    [% title = "Text příliš dlouhý" %]
-    The text you entered in the [% field_descs.$field FILTER html %]
-    field is too long ([% text.length FILTER html %] characters,
-    above the maximum length allowed of
-    [%+ constants.MAX_FREETEXT_LENGTH FILTER none %] characters).
+    [% title = "Text je příliš dlouhý" %]
+    Text vložený v poli [% field_descs.$field FILTER html %]
+    je příliš dlouhý ([% text.length FILTER html %] znaků),
+    což je nad maximální povolenou hodnotou ([%+ constants.MAX_FREETEXT_LENGTH FILTER none %] znaků).
 
   [% ELSIF error == "group_cannot_delete" %]
-    [% title = "Nemohu smazat skupinu" %]
-    Skupina <em>[% group.name FILTER html %]</em> nemůže být smazána protože
+    [% title = "Nelze smazat skupinu" %]
+    Skupinu <em>[% group.name FILTER html %]</em> nelze smazat, protože
     jsou zde
     <a href="editgroups.cgi?action=del&amp;group=
-             [%- group.id FILTER url_quote %]">záznamy</a>
-    , které na ni odkazují. Všechny odkazy na tuto skupinu musí
+             [%- group.id FILTER uri %]">záznamy</a>
+    v databázi, které se na ni odkazují. Všechny odkazy na tuto skupinu musí
     být odstraněny před odstraněním samotné skupiny.
-
-  [% ELSIF error == "group_change_denied" %]
-    [% title = "Nelze přidat/odebrat tuto skupinu" %]
-    Pokusil jsi se přidat nebo odebrat skupinu '[% group.name FILTER html %]'
-    z požadavku [%+ bug.id FILTER html %], ale nemáš na to 
-    potřebná oprávnění.
 
   [% ELSIF error == "group_exists" %]
     [% title = "Skupina již existuje" %]
     Skupina [% name FILTER html %] již existuje.
 
   [% ELSIF error == "group_has_special_role" %]
-    [% title = "Není možno smazat skupinu" %]
+    [% title = "Skupinu nelze smazat" %]
     [% IF groups.size == 1 %]
-      [% attr = "it" %]
-      [% param = "parameter" %]
+      [% attr = "l" %]
+      [% param = "parametr" %]
     [% ELSE %]
-      [% attr = "them" %]
-      [% param = "parameters" %]
+      [% attr = "ly" %]
+      [% param = "parametry" %]
     [% END %]
-    The group '[% name FILTER html %]' is used by the
-    '[% groups.join("' and '") FILTER html %]' [% param FILTER html %].
-    In order to delete this group, you first have to change the
-    [%+ param FILTER html %] to make [% attr FILTER html %] point to another group.
-
+    Skupina '[% name FILTER html %]' je používána
+    [% param FILTER html %] '[% groups.join("' a '") FILTER html %]'.
+    Pro smazání skupiny je nejdříve zapotřebí změnit
+    [%+ param FILTER html %] aby odkazova[% attr FILTER html %] na jinou skupinu.
 
   [% ELSIF error == "group_invalid_removal" %]
-    You tried to remove [% terms.bug %] [%+ bug.id FILTER html %]
-    from the '[% group.name FILTER html %]' group, but [% terms.bugs %]
-     in the '[% product FILTER html %]' product can not be removed from that
-    group.
-    
-  [% ELSIF error == "group_invalid_restriction" %]
-    You tried to restrict [% terms.bug %] [%+ bug.id FILTER html %] to
-    to the '[% group.name FILTER html %]' group, but [% terms.bugs %] in the
-    '[% product FILTER html %]' product can not be restricted to
-    that group.
+    Pokoušíte se odstranit požadavek [%+ bug_id FILTER html %]
+    ze skupiny '[% name FILTER html %]', ale buď tato skupina neexistuje
+    nebo nejste oprávnění odstranit požadavek z této skupiny
+    v produktu '[% product FILTER html %]'.
+
+  [% ELSIF error == "group_restriction_not_allowed" %]
+    [% title = "Restrikce skupiny není povolena" %]
+    Pokoušíte se o restrikci [% bug_id ? "$terms.bug $bug_id" : terms.abug FILTER html %]
+    ke skupině '[% name FILTER html %]', ale buď tato skupina neexistuje nebo
+    nejste oprávněni k restrikci požadavku k této skupině v produktu '[% product FILTER html %]'.
 
   [% ELSIF error == "group_not_specified" %]
-    [% title = "Group not specified" %]
-    No group was specified.
+    [% title = "Nespecifikovaná skupina" %]
+    Skupina nebyla specifikována.
+
+  [% ELSIF error == "group_not_visible" %]
+    [% title = "Nepovolená skupina" %]
+    Nejste oprávněni k prohlížení členů skupiny [% group.name FILTER html %].
 
   [% ELSIF error == "system_group_not_deletable" %]
-    [% title = "Není možno smazat systémovou skupinu" %]
+    [% title = "Systémovou skupinu nelze smazat" %]
     <em>[% name FILTER html %]</em> je systémová skupina.
-    Tato skupina nemůže být smazána.
-
-  [% ELSIF error == "group_unknown" %]
-    [% title = "Neznámá skupina" %]
-    Skupina [% name FILTER html %] neexistuje. Prosím specifikuj
-    platný název skupiny.
+    Tuto skupinu nelze smazat.
 
   [% ELSIF error == "illegal_attachment_edit" %]
-    [% title = "Neautorizovaná akce" %]
-    Nejsi autorizován k úpravě přílohy [% attach_id FILTER html %].
+    [% title = "Nepovolená úprava přílohy" %]
+    Nejste oprávněni upravovat přílohu [% attach_id FILTER html %].
 
   [% ELSIF error == "illegal_attachment_edit_bug" %]
-    [% title = "Neautorizovaná akce" %]
-    Nejsi autorizován k úpravě přílohy požadavku 
+    [% title = "Nepovolená úprava přílohy požadavku" %]
+    Nejste oprávněni upravovat přílohy požadavku 
     [%+ bug_id FILTER html %].
          
-  [% ELSIF error == "illegal_attachment_is_patch" %]
-    [% title = "Your Search Makes No Sense" %]
-    The only legal values for the <em>Attachment is patch</em> field are
-    0 and 1.
-
   [% ELSIF error == "illegal_bug_status_transition" %]
-    [% title = "Illegal $terms.Bug Status Change" %]
+    [% title = "Nepovolená změna stavu požadavku" %]
     [% IF old.defined %]
-      You are not allowed to change the [% terms.bug %] status from
-      [%+ old.name FILTER html %] to [% new.name FILTER html %].
+      Nejste oprávněni ke změně stavu požadavku
+      z [%+ old.name FILTER html %] na [% new.name FILTER html %].
     [% ELSE %]
-      You are not allowed to file new [% terms.bugs %] with the
-      [%+ new.name FILTER html %] status. 
+      Nejste oprávněni k vytvoření požadavku
+      ve stavu [%+ new.name FILTER html %].
     [% END %]
 
   [% ELSIF error == "illegal_change" %]
@@ -800,11 +826,6 @@
     but only a user allowed to edit 
     both related [% terms.bugs %] may change that field.
 
-  [% ELSIF error == "illegal_changed_in_last_x_days" %]
-    [% title = "Your Search Makes No Sense" %]
-    The <em>Changed in last ___ days</em> field must be a simple number. 
-    You entered <tt>[% value FILTER html %]</tt>, which isn't.
-    
   [% ELSIF error == "illegal_date" %]
     [% title = "Neplatné datum" %]
     '<tt>[% date FILTER html %]</tt>' není platné datum.
@@ -835,11 +856,6 @@
     [% admindocslinks = {'groups.html' => 'Assigning Group Controls to Products'} %]
     Your group control combination for group &quot;
     [% groupname FILTER html %]&quot; is illegal.
-
-  [% ELSIF error == "illegal_is_obsolete" %]
-    [% title = "Your Search Makes No Sense" %]
-    The only legal values for the <em>Attachment is obsolete</em> field are
-    0 and 1.
 
   [% ELSIF error == "illegal_query_name" %]
     [% title = "Neplatný název hledání" %]
@@ -954,20 +970,20 @@
 
   [% ELSIF error == "invalid_user_group" %]
     [% title = "Neplatná uživatelská skupina" %]
-    [% IF users.size > 1 %] Users [% ELSE %] User [% END %]
+    [% IF users.size > 1 %] Uživatelé [% ELSE %] Uživatel [% END %]
     '[% users.join(', ') FILTER html %]'
-    [% IF users.size > 1 %] are [% ELSE %] is [% END %]
-    not able to edit the
+    [% IF users.size > 1 %] nemají [% ELSE %] nemá [% END %]
+    oprávnění upravovat 
     [% IF product %]
       '[% product FILTER html %]'
     [% END %]
     [%+ field_descs.product FILTER html %]
     [% IF bug_id %]
-      for [% terms.bug %] '[% bug_id FILTER html %]'.
+      pro [% terms.bug %] '[% bug_id FILTER html %]'.
     [% ELSIF new %]
-      and may not be included on a new [% terms.bug %].
+      a nemusí být zahrnut/i v novém [% terms.bugu %].
     [% ELSE %]
-      for at least one [% terms.bug %] being changed.
+      pro změnu nejméně jednoho [% terms.bugu %].
     [% END %]
 
   [% ELSIF error == "invalid_username" %]
@@ -983,8 +999,8 @@
       # being locked out.
       #%]
     [% IF remaining <=  2 %]
-      Pokud nevložíš správné heslo po  dalších
-      [%+ remaining FILTER html %] pokusech, Tvůj účet bude
+      Pokud nevložíte správné heslo během dalších
+      [%+ remaining FILTER html %] pokusů, Váš účet bude
       zablokován na 
       [%+ constants.LOGIN_LOCKOUT_INTERVAL FILTER html %] minut.
     [% END %]
@@ -993,6 +1009,11 @@
     When using JSON-RPC over GET, you must specify a 'method'
     parameter. See the documentation at
     [%+ docs_urlbase FILTER html %]api/Bugzilla/WebService/Server/JSONRPC.html
+
+  [% ELSIF error == "json_rpc_illegal_content_type" %]
+    When using JSON-RPC over POST, you cannot send data as
+    [%+ content_type FILTER html %]. Only application/json and
+    application/json-rpc are allowed.
 
   [% ELSIF error == "json_rpc_invalid_params" %]
     Could not parse the 'params' argument as valid JSON.
@@ -1024,11 +1045,6 @@
     [% title = "Invalid Keyword Name" %]
     You may not use commas or whitespace in a keyword name.
      
-  [% ELSIF error == "local_file_too_large" %]
-    [% title = "Local File Too Large" %]
-    Local file uploads must not exceed 
-    [% Param('maxlocalattachment') %] MB in size.
-
   [% ELSIF error == "login_needed_for_password_change" %]
     [% title = "Přihlašovací jméno je vyžadováno" %]
     Musíš vložit přihlašovací jméno když chceš změnit své heslo.
@@ -1095,25 +1111,25 @@
     
   [% ELSIF error == "missing_attachment_description" %]
     [% title = "Chybějící popis přílohy" %]
-    Musíš vložit popis přílohy.
+    Prosím vložte popis přílohy.
     
   [% ELSIF error == "missing_category" %]
     [% title = "Chybějící kategorie" %]
-    Nespecifikoval jsi kategorii pro tuto sérii.
+    Nebyla specifikována kategorie pro tuto sérii.
 
   [% ELSIF error == "missing_component" %]
     [% title = "Chybějící komponenta" %]
     [% admindocslinks = {'products.html'   => 'Správa produktů',
                          'components.html' => 'Vytváření komponenty'} %]
-    Sorry, the product <em>[% product.name FILTER html %]</em>
-    has to have at least one component in order for you to
-    enter [% terms.abug %] into it.<br>
+    Bohužel produkt <em>[% product.name FILTER html %]</em>
+    musí obsahovat alespoň jednu aktivní komponentu,
+    aby bylo možné pro něj vložit požadavek.
     [% IF user.in_group("editcomponents", product.id) %]
-      <a href="editcomponents.cgi?action=add&amp;product=[% product.name FILTER url_quote %]">Vytvořit
+      <a href="editcomponents.cgi?action=add&amp;product=[% product.name FILTER uri %]">Vytvořit
       novou komponentu</a>.
     [% ELSE %]
-      Prosím kontaktuj [% Param("maintainer") %] a zeptej se
-      jak přidat komponentu tomuto produktu.
+      Prosím kontaktujte [% Param("maintainer") %] a zeptejte se,
+      jak přidat komponentu k tomuto produktu.
     [% END %]
 
   [% ELSIF error == "missing_content_type" %]
@@ -1173,10 +1189,10 @@
     [% title = "Missing Version" %]
     [% admindocslinks = {'versions.html' => 'Defining versions'} %]
     Sorry, the product <em>[% product.name FILTER html %]</em>
-    has to have at least one version in order for you to
+    has to have at least one active version in order for you to
     enter [% terms.abug %] into it.<br>
     [% IF user.in_group("editcomponents", product.id) %]
-      <a href="editversions.cgi?action=add&amp;product=[% product.name FILTER url_quote %]">Create
+      <a href="editversions.cgi?action=add&amp;product=[% product.name FILTER uri %]">Create
       a new version</a>.
     [% ELSE %]
       Please contact [% Param("maintainer") %] and ask them
@@ -1188,13 +1204,13 @@
     at once.
 
   [% ELSIF error == "need_quip" %]
-    [% title = "Quip Required" %]
+    [% title = "Je vyžadován bonmot" %]
     [% docslinks = {'quips.html' => 'About quips'} %]
-    Please enter a quip in the text field.
+    Prosím vložte bonmot do textového pole.
 
   [% ELSIF error == "new_password_missing" %]
-    [% title = "New Password Missing" %]
-    You must enter a new password.
+    [% title = "Nové heslo chybí" %]
+    Prosím vložte nové heslo.
 
   [% ELSIF error == "no_axes_defined" %]
     [% title = "No Axes Defined" %]
@@ -1210,24 +1226,9 @@
       pro zobrazení.
     [% END %]
 
-  [% ELSIF error == "no_bug_ids" %]
-    [% title = BLOCK %]No [% terms.Bugs %] Selected[% END %]
-    You didn't choose any [% terms.bugs %] to
-    [% IF action == "add" %] add to [% ELSE %] remove from [% END %]
-    the [% tag FILTER html %] tag.
-
-  [% ELSIF error == "no_bugs_in_list" %]
-    [% title = "Delete Tag?" %]
-    This will remove all [% terms.bugs %] from the
-    <em>[% name FILTER html %]</em> tag. This will delete the tag completely. Click
-    <a href="buglist.cgi?cmdtype=dorem&amp;remaction=forget&amp;namedcmd=
-    [%- name FILTER url_quote %]&amp;token=
-    [%- issue_hash_token([query_id, name]) FILTER url_quote %]">here</a>
-    if you really want to delete it.
-
-  [% ELSIF error == "no_bugs_to_remove" %]
+  [% ELSIF error == "no_tag_to_edit" %]
     [% title = "No Tag Selected" %]
-    You didn't select a tag from which to remove [% terms.bugs %].
+    You tried to create or remove a tag with no name.
 
   [% ELSIF error == "no_initial_bug_status" %]
     [% title = "No Initial $terms.Bug Status" %]
@@ -1235,9 +1236,9 @@
     Please report the problem to [% Param("maintainer") %].
 
   [% ELSIF error == "no_new_quips" %]
-    [% title = "No New Quips" %]
+    [% title = "Žádný nový bonmot" %]
     [% admindocslinks = {'quips.html' => 'Controlling quip usage'} %]
-    This site does not permit the addition of new quips.
+    Tato instalace neumožňuje přidávání nových bonmotů.
 
   [% ELSIF error == "no_page_specified" %]
     [% title = "No Page Specified" %]
@@ -1290,8 +1291,7 @@
     [% IF class == "Bugzilla::User" %]
       Either you mis-typed the name or that user has not yet registered
       for a [% terms.Bugzilla %] account.
-    [% END %]
-    [% IF class == "Bugzilla::Keyword" %]
+    [% ELSIF class == "Bugzilla::Keyword" %]
       The legal keyword names are <a href="describekeywords.cgi">listed
       here</a>.
     [% END %]
@@ -1317,7 +1317,7 @@
     Your password is currently less than
     [%+ constants.USER_PASSWORD_MIN_LENGTH FILTER html %] characters long,
     which is the new minimum length required for passwords.
-    You must <a href="token.cgi?a=reqpw&loginname=[% locked_user.email FILTER html %]">
+    You must <a href="token.cgi?a=reqpw&amp;loginname=[% locked_user.email FILTER uri %]">
     request a new password</a> in order to log in again.
 
   [% ELSIF error == "password_too_short" %]
@@ -1325,14 +1325,25 @@
     The password must be at least
     [%+ constants.USER_PASSWORD_MIN_LENGTH FILTER html %] characters long.
 
-  [% ELSIF error == "patch_too_large" %]
-    [% title = "File Too Large" %]
-    The file you are trying to attach is [% filesize FILTER html %] 
-    kilobytes (KB) in size.
-    Patches cannot be more than [% Param('maxattachmentsize') %] KB in size.
-    Try splitting your patch into several pieces.
+  [% ELSIF error == "password_not_complex" %]
+     [% title = "Password Fails Requirements" %]
+     [% passregex = Param('password_complexity') %]
+     The password must contain at least one:
+     <ul>
+       [% IF passregex.search('letters') %]
+         <li>UPPERCASE letter</li>
+         <li>lowercase letter</li>
+       [% END %]
+       [% IF passregex.search('numbers') %]
+         <li>digit</li>
+       [% END %]
+       [% IF passregex.search('specialchars') %]
+         <li>special character</li>
+       [% END %]
+     </ul>
 
   [% ELSIF error == "product_access_denied" %]
+    [% title = "Product Access Denied" %]
     Either the product 
     [%+ IF id.defined %]
       with the id [% id FILTER html %]
@@ -1366,7 +1377,7 @@
     [% title = "Must define new default milestone" %]
     [% admindocslinks = {'products.html' => 'Administering products',
                          'milestones.html' => 'About Milestones'} %]
-    You must <a href="editmilestones.cgi?action=add&amp;product=[% product FILTER url_quote %]">
+    You must <a href="editmilestones.cgi?action=add&amp;product=[% product FILTER uri %]">
     create the milestone '[% milestone FILTER html %]'</a> before
     it can be made the default milestone for product '[% product FILTER html %]'.
 
@@ -1410,14 +1421,14 @@
                          'versions.html' => 'Administering versions'} %]
     You must enter a valid version to create a new product.
 
-  [% ELSIF error == "query_name_exists" %]
-    [% title = "Search Name Already In Use" %]
-    The name <em>[% name FILTER html %]</em> is already used by another
-    saved search. You first have to
-    <a href="buglist.cgi?cmdtype=dorem&amp;remaction=forget&amp;namedcmd=
-    [%- name FILTER url_quote %]&amp;token=
-    [% issue_hash_token([query_id, name]) FILTER url_quote %]">delete</a>
-    it if you really want to use this name.
+  [% ELSIF error == "product_unknown_component" %]
+    [% title = "Unknown Component" %]
+    Product '[% product FILTER html %]' has no component
+    [% IF comp_id %]
+      with ID [% comp_id FILTER html %].
+    [% ELSE %]
+      named '[% comp FILTER html %]'.
+    [% END %]
 
   [% ELSIF error == "query_name_missing" %]
     [% title = "No Search Name Specified" %]
@@ -1451,9 +1462,9 @@
     the new assignee.
 
   [% ELSIF error == "require_component" %]
-    [% title = "Component Needed" %]
-    To file this [% terms.bug %], you must first choose a component.
-    If necessary, just guess.
+    [% title = "Je zapotřebí vybrat komponentu" %]
+    Pro vložení [% terms.bugu %] je zapotřebí nejdříve vybrat komponentu.
+    Pokud si nejste jistí, prostě si tipněte ;)
 
   [% ELSIF error == "relationship_loop_single" %]
     [% title = "Relationship Loop Detected" %]
@@ -1498,6 +1509,16 @@
     and the "matches" search can only be used with the "content"
     field.
 
+  [% ELSIF error == "search_field_operator_invalid" %]
+    [% terms.Bugzilla %] does not support using the 
+    "[%+ field_descs.$field FILTER html %]" ([% field FILTER html %])
+    field with the "[% search_descs.$operator FILTER html %]" 
+    ([% operator FILTER html %]) search type.
+
+  [% ELSIF error == "see_also_self_reference" %]
+    You cannot put this [% terms.bug %] into its own
+    [%+ field_descs.see_also FILTER html %] field.
+
   [% ELSIF error == "series_already_exists" %]
     [% title = "Series Already Exists" %]
     [% docslinks = {'reporting.html' => 'Reporting'} %]
@@ -1506,10 +1527,6 @@
       [%+ series.name FILTER html %]</em>
       already exists.
     
-  [% ELSIF error == "sidebar_supports_mozilla_only" %]
-    Sorry - sidebar.cgi currently only supports Mozilla based web browsers.
-    <a href="http://www.mozilla.org">Upgrade today</a>. :-)
-
   [% ELSIF error == "still_unresolved_bugs" %]
     [% title = "Unresolved Dependencies" %]
     [% terms.Bug %] [%+ bug_id FILTER bug_link(bug_id) FILTER none %]
@@ -1547,20 +1564,25 @@
   [% ELSIF error == "sudo_password_required" %]
     [% title = "Password Required" %]
     Your [% terms.Bugzilla %] password is required to begin a sudo 
-    session. Please <a href="relogin.cgi?action=prepare-sudo&target_login=
-    [%- target_login FILTER html %]&reason=
-    [%- reason FILTER html %]">go back</a> and enter your password.
+    session. Please <a href="relogin.cgi?action=prepare-sudo&amp;target_login=
+    [%- target_login FILTER uri %]&amp;reason=
+    [%- reason FILTER uri %]">go back</a> and enter your password.
     
   [% ELSIF error == "sudo_preparation_required" %]
     [% title = "Preparation Required" %]
     You may not start a sudo session directly.  Please
-    <a href="relogin.cgi?action=prepare-sudo&target_login=
-    [%- target_login FILTER html %]&reason=
-    [%- reason FILTER html %]">start your session normally</a>.
+    <a href="relogin.cgi?action=prepare-sudo&amp;target_login=
+    [%- target_login FILTER uri %]&amp;reason=
+    [%- reason FILTER uri %]">start your session normally</a>.
 
   [% ELSIF error == "sudo_protected" %]
     [% title = "User Protected" %]
     The user [% login FILTER html %] may not be impersonated by sudoers.
+
+  [% ELSIF error == "tag_name_too_long" %]
+    [% title = "Tag Name Too Long" %]
+    The tag name must be less than [% constants.MAX_LEN_QUERY_NAME FILTER html %]
+    characters long.
 
   [% ELSIF error == "token_does_not_exist" %]
     [% title = "Token Does Not Exist" %]
@@ -1681,6 +1703,14 @@
     [% title = "Illegal User ID" %]
     User ID '[% userid FILTER html %]' is not valid integer.
 
+  [% ELSIF error == "extern_id_exists" %]
+    [% title = "Account Already Exists" %]
+    There is already an account
+    [% IF existing_login_name %]
+      ([% existing_login_name FILTER html %])
+    [% END %]
+    with the External Login ID "[% extern_id FILTER html %]".
+
   [% ELSE %]
 
     [%# Try to find hooked error messages %]
@@ -1726,7 +1756,7 @@
 </table>
 
 <p>
-  Zmáčkni prosím <b>zpět</b> a zkus to znovu.
+  Zmáčkni prosím <b>zpět</b> v prohlížeči a zkus to znovu.
 </p>
 
 [%# If a saved search fails, people want the ability to edit or delete it. 
@@ -1741,11 +1771,11 @@
   <p>  
     Alternatively, you can    
     <a href="buglist.cgi?cmdtype=dorem&amp;remaction=forget&amp;namedcmd=
-                  [% namedcmd FILTER url_quote %]">forget</a>
+                  [% namedcmd FILTER uri %]">zapomenout</a>
                   
     [% FOREACH q = Bugzilla.user.queries %]
       [% IF q.name == namedcmd %]
-        or <a href="query.cgi?[% q.url FILTER html %]">edit</a>
+        or <a href="query.cgi?[% q.url FILTER uri %]">upravit</a>
       [% END %]
     [% END %]
     
@@ -1783,7 +1813,7 @@
   [% ELSIF class == "Bugzilla::Search::Recent" %]
     poslední hledání
   [% ELSIF class == "Bugzilla::Search::Saved" %]
-    uložení hledání
+    uložené hledání
   [% ELSIF ( matches = class.match('^Bugzilla::Field::Choice::(.+)') ) %]
     [% SET field_name = matches.0 %]
     [% field_descs.$field_name FILTER html %]

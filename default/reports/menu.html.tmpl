@@ -32,7 +32,8 @@
 %]
 
 <p>
-  [% terms.Bugzilla %] vám umožňuje sledovat a prohlížet stav [% terms.bugsu %] několika způsoby:
+  [% terms.Bugzilla %] vám umožňuje sledovat a prohlížet stav databáze
+  [% terms.bugsu %] mnoha vzrušujícími způsoby.
 </p>
 
 <h2>Aktulní stav</h2>
@@ -40,37 +41,45 @@
 <ul>
   <li id="report_search">
     <strong><a href="query.cgi">Hledání</a></strong> -
-    zobrazit seznam [% terms.bugsu %].
+    zobrazí seznam [% terms.bugsu %].
   </li>
   <li id="report_tabular">
     <strong>
       <a href="query.cgi?format=report-table">Sestavy</a>
-    </strong> - zobrazit sestavy [% terms.bugsu %] v 1, 2 nebo 3 rozměrech jako HTML nebo CSV.
+    </strong> -
+    zobrazí seznamy a počty [% terms.bugsu %] v 1, 2 nebo 3 rozměrech jako HTML nebo CSV.
   </li>
   [% IF feature_enabled('graphical_reports') %]
     <li id="report_graphical">
       <strong>
         <a href="query.cgi?format=report-graph">Grafy</a>
-      </strong> - spojnicové, sloupcové nebo koláčové grafy.
+      </strong> -
+      vykreslí spojnicové, sloupcové či koláčové grafy.
     </li>
   [% END %]
+  <li id="report_duplicates">
+    <strong><a href="duplicates.cgi">Duplikáty</a></strong> -
+    vypíší seznam nejčastěji reportovaných [% terms.bugsu %].
+  </li>
   [% Hook.process('current_state') %]
 </ul>
 
 [% IF feature_enabled('new_charts') OR feature_enabled('old_charts') %]
-  <h2>Časové řady</h2>
+  <h2>Změny v čase/časové řady</h2>
 
   <ul>
     [% IF feature_enabled('old_charts') %]
       <li id="old_charts">
         <strong><a href="reports.cgi">Stará verze grafů</a></strong> - 
-        vykreslit stav nebo řešení [% terms.bugsu %] v čase, pro jednotlivé produkty
+        vykreslí stav nebo řešení [% terms.bugsu %] v čase 
+        pro jednotlivé produkty v databázi.
       </li>
     [% END %]
     [% IF feature_enabled('new_charts') AND user.in_group(Param("chartgroup")) %]
       <li id="new_charts">
         <strong><a href="chart.cgi">Nová verze grafů</a></strong> - 
-        vykreslit libovolné výběr [% terms.bugsu %] v čase. Užitečnější.
+        vykreslí výsledky jakéhokoliv vyhledávání v čase.
+        Mnohem mocnější.
       </li>
     [% END %]
   </ul>

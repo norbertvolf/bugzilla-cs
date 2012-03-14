@@ -31,7 +31,7 @@
 
 [% PROCESS global/header.html.tmpl
    title = "$terms.Bugzilla - Hlavní strana"
-   header = "Main Page" 
+   header = "Hlavní strana" 
    header_addl_info = "version $constants.BUGZILLA_VERSION"
    style_urls = [ 'skins/standard/index.css' ]
 %]
@@ -46,17 +46,11 @@ function onLoadActions() {
   }
   document.getElementById('quicksearch_top').focus();
 }
-function addSidebar() {
-  var sidebarname=window.location.host;
-  if (!/bug/i.test(sidebarname))
-    sidebarname="[% terms.Bugzilla %] "+sidebarname;
-  window.sidebar.addPanel (sidebarname, "[% urlbase FILTER html %]sidebar.cgi", "");
-}
-var quicksearch_message = "Enter [% terms.abug %] # or some search terms";
+var quicksearch_message = "Vlož ID [% terms.bugu %] nebo vyhledávaná slova";
 
 function checkQuicksearch( form ) {
   if (form.quicksearch.value == '' || form.quicksearch.value == quicksearch_message ) { 
-    alert('Please enter one or more search terms first.');
+    alert('Zadejte prosím nejdříve jedno nebo více vyhledávaných slov.');
     return false; 
   }
   return true;         
@@ -95,26 +89,32 @@ YAHOO.util.Event.onDOMReady(onLoadActions);
       Datum vydání: [% release.data.date FILTER html %]</p>
 
       <p class="notice">Tato zpráva je dostupná pouze administrátorů. 
-      Toto upozornění lze nastavit ve formuláři
-      <a href="editparams.cgi?section=general#upgrade_notification">Administrace</a> page.</p>
+      Toto upozornění lze nastavit ve formuláři na stránce
+      <a href="editparams.cgi?section=general#upgrade_notification">Administrace</a>.</p>
     [% ELSIF release.error == "cannot_download" %]
-      <p>The local XML file '[% release.xml_file FILTER html %]' cannot be created.
-      Please make sure the web server can write in this directory and that you can access
-      the web. If you are behind a proxy, set the
-      <a href="editparams.cgi?section=advanced#proxy_url_desc">proxy_url</a> parameter correctly.</p>
+      <p>Vzdálený soubor <a href="[% constants.REMOTE_FILE FILTER html %]">
+      [%~ constants.REMOTE_FILE FILTER html %]</a> není možné stáhnout
+      (důvod: [% release.reason FILTER html %]).<br>
+      Buď je vzdálený server dočasně nedostupný nebo Váš web server nemůže přistupovat
+      k síti. Pokud jste za proxy serverem, nastavte si prosím správně parametry
+      <a href="editparams.cgi?section=advanced#proxy_url_desc">proxy_url</a>.</p>
+    [% ELSIF release.error == "no_write" %]
+      <p>Lokální soubor XML '[% constants.LOCAL_FILE FILTER html %]' nelze vytvořit
+      (důvod: [% release.reason FILTER html %]).<br>
+      Prosím ujistěte se, že web server může zapisovat do tohoto adresáře.</p>
     [% ELSIF release.error == "no_update" %]
-      <p>The local XML file '[% release.xml_file FILTER html %]' cannot be updated.
-      Please make sure the web server can edit this file.</p>
+      <p>Lokální soubor XML '[% constants.LOCAL_FILE FILTER html %]' není možné aktualizovat.
+      Prosím ujistěte se, že web server může aktualizovat tento soubor.</p>
     [% ELSIF release.error == "no_access" %]
-      <p>The local XML file '[% release.xml_file FILTER html %]' cannot be read.
-      Please make sure this file has the correct rights set on it.</p>
+      <p>Lokální soubor XML '[% constants.LOCAL_FILE FILTER html %]' nelze číst.
+      Prosím ujistěte se, že tento soubor má přiřazena správná oprávnění.</p>
     [% ELSIF release.error == "corrupted" %]
-      <p>The local XML file '[% release.xml_file FILTER html %]' has an invalid XML format.
-      Please delete it and try accessing this page again.</p>
+      <p>Lokální soubor XML '[% constants.LOCAL_FILE FILTER html %]' má neplatný XML formát.
+      Prosím smažte jej a zkuste opětovně načíst tuto stránku.</p>
     [% ELSIF release.error == "unknown_parameter" %]
-      <p>'[% Param("upgrade_notification") FILTER html %]' is not a valid notification
-      parameter. Please check this parameter in the
-      <a href="editparams.cgi?section=general#upgrade_notification_desc">Parameters</a> page.</p>
+      <p>'[% Param("upgrade_notification") FILTER html %]' není platný parametr upozornění.
+      Prosím zkontrolujte jej na stránce s
+      <a href="editparams.cgi?section=general#upgrade_notification_desc">parametry</a>.</p>
     [% END %]
   </div>
 [% END %]
@@ -125,27 +125,36 @@ YAHOO.util.Event.onDOMReady(onLoadActions);
       <td>
         <h1 id="welcome">Vítejte v aplikaci [% terms.Bugzilla %]</h1>
         <div class="intro">[% Hook.process('intro') %]</div>
-        <a id="enter_bug" class="bz_common_actions"
-           href="enter_bug.cgi"><span>Zadat [% terms.bug2 %]</span></a>
-      
-        <a id="query" class="bz_common_actions" 
-           href="query.cgi"><span>Hledat</span></a>
-      
-        <a id="account" class="bz_common_actions"
-          [% IF user.id %]
-            href="userprefs.cgi"><span>Nastavit</span></a>
-          [% ELSIF Param('createemailregexp')
-                   && user.authorizer.user_can_create_account 
-          %]
-            href="createaccount.cgi"><span>Vytvořit nový účet</span></a>
-          [% ELSE %]
-            href="?GoAheadAndLogIn=1"><span>Přihlásit se</span></a>
-          [% END %]
+
+        <div class="bz_common_actions">
+          <ul>
+            <li>
+              <a id="enter_bug" href="enter_bug.cgi"><span>Vložit
+              požadavek</span></a>
+            </li>
+            <li>
+              <a id="query" href="query.cgi"><span>Hledat</span></a>
+            </li>
+            <li>
+              <a id="account"
+                 [% IF user.id %]
+                   href="userprefs.cgi"><span>Uživatelská nastavení</span></a>
+                 [% ELSIF Param('createemailregexp')
+                          && user.authorizer.user_can_create_account 
+                 %]
+                   href="createaccount.cgi"><span>Vytvořit nový účet</span></a>
+                 [% ELSE %]
+                   href="?GoAheadAndLogIn=1"><span>Přihlásit se</span></a>
+                 [% END %]
+            </li>
+          </ul>
+        </div>
 
         <form id="quicksearchForm" name="quicksearchForm" action="buglist.cgi"
               onsubmit="return checkQuicksearch(this);">
           <div>
             <input id="quicksearch_main" type="text" name="quicksearch"
+              title="Quick Search" 
               onfocus="quicksearchHelpText(this.id, 'hide');"
               onblur="quicksearchHelpText(this.id, 'show');"
             >

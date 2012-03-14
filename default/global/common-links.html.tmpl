@@ -24,18 +24,18 @@
 
 <ul class="links">
   <li><a href="./">Hlavní strana</a></li>
-  <li><span class="separator">| </span><a href="enter_bug.cgi">Nový</a></li>
-  <li><span class="separator">| </span><a href="describecomponents.cgi">Prohlížet</a></li>
+  <li><span class="separator">| </span><a href="enter_bug.cgi">Nový požadavek</a></li>
+  <li><span class="separator">| </span><a href="describecomponents.cgi">Komponenty</a></li>
   <li><span class="separator">| </span><a href="query.cgi">Hledat</a></li>
 
   <li class="form">
     <span class="separator">| </span>
     <form action="buglist.cgi" method="get"
         onsubmit="if (this.quicksearch.value == '')
-                  { alert('Please enter one or more search terms first.');
+                  { alert('Prosím vložte nejdříve jedno či více hesel pro vyhledávání.');
                     return false; } return true;">
     <input class="txt" type="text" id="quicksearch[% qs_suffix FILTER html %]" name="quicksearch" 
-           value="[% quicksearch FILTER html %]">
+           title="Quick Search" value="[% quicksearch FILTER html %]">
     <input class="btn" type="submit" value="Hledat" 
            id="find[% qs_suffix FILTER html %]">
     [%-# Work around FF bug: keep this on one line %]</form>
@@ -47,8 +47,8 @@
     [% IF Param('shutdownhtml') || Bugzilla.has_flags %]
       <span class="separator">| </span>
       [% IF user.id %]
-        <a href="request.cgi?requester=[% user.login FILTER url_quote %]&amp;requestee=
-                 [% user.login FILTER url_quote %]&amp;do_union=1&amp;group=type&amp;action=queue">Mé požadavky</a>
+        <a href="request.cgi?requester=[% user.login FILTER uri %]&amp;requestee=
+                 [% user.login FILTER uri %]&amp;do_union=1&amp;group=type&amp;action=queue">Mé požadavky</a>
       [% ELSE %]
         <a href="request.cgi">Požadavky</a>
       [% END %]
@@ -70,7 +70,7 @@
     <li>
       <span class="separator">| </span>
       [% IF user.authorizer.can_logout %]
-        <a href="index.cgi?logout=1">Odhlásit</a>
+        <a href="index.cgi?logout=1">Odhlásit se</a>
       [% ELSE %]
         Přihlášen&nbsp;jako
       [% END %]

@@ -19,12 +19,14 @@
   #                 Frédéric Buclin <LpSolit@gmail.com>
   #%]
 
-[% RETURN UNLESS attachments.size || Param("maxattachmentsize") %]
+[% RETURN UNLESS attachments.size || Param("maxattachmentsize") || Param("maxlocalattachment") %]
 
 <script type="text/javascript">
 <!--
 function toggle_display(link) {
     var table = document.getElementById("attachment_table");
+    var view_all = document.getElementById("view_all");
+    var hide_obsolete_url_parameter = "&hide_obsolete=1";
     // Store current height for scrolling later
     var originalHeight = table.offsetHeight;
     var rows = YAHOO.util.Dom.getElementsByClassName(
@@ -35,10 +37,12 @@ function toggle_display(link) {
     }
 
     if (YAHOO.util.Dom.hasClass(rows[0], 'bz_default_hidden')) {
-        link.innerHTML = "Show Obsolete";
+        link.innerHTML = "Zobrazit zastaralé";
+        view_all.href = view_all.href + hide_obsolete_url_parameter 
     }
     else {
-        link.innerHTML = "Hide Obsolete";
+        link.innerHTML = "Skrýt zastaralé";
+        view_all.href = view_all.href.replace(hide_obsolete_url_parameter,"");
     }
 
     var newHeight = table.offsetHeight;
@@ -68,9 +72,8 @@ function toggle_display(link) {
         [% obsolete_attachments = obsolete_attachments + 1 %]
       [% END %]
       <tr id="a[% count %]" class="[% "bz_contenttype_" _ attachment.contenttype
-                     FILTER css_class_quote UNLESS attachment.isurl %]
+                     FILTER css_class_quote %]
                  [% " bz_patch" IF attachment.ispatch %]
-                 [% " bz_url" IF attachment.isurl %]
                  [% " bz_private" IF attachment.isprivate %]
                  [% " bz_tr_obsolete bz_default_hidden" 
                      IF attachment.isobsolete %]">
@@ -87,8 +90,6 @@ function toggle_display(link) {
               ([% attachment.datasize FILTER unitconvert %],
               [% IF attachment.ispatch %]
                 patch)
-              [% ELSIF attachment.isurl %]
-                url)
               [% ELSE %]
                 [%+ attachment.contenttype FILTER html %])
               [% END %]
@@ -150,16 +151,18 @@ function toggle_display(link) {
         <span class="bz_attach_view_hide">
           [% IF obsolete_attachments %]
             <a href="#a0" onclick="return toggle_display(this);">Zobrazit
-              překonané</a> ([% obsolete_attachments %])
+              zastaralé</a> ([% obsolete_attachments %])
           [% END %]
           [% IF Param("allow_attachment_display") %]
-            <a href="attachment.cgi?bugid=[% bugid %]&amp;action=viewall">Zobrazit vše</a>
+            <a id="view_all" href="attachment.cgi?bugid=
+                  [%- bugid %]&amp;action=viewall
+                  [%- "&amp;hide_obsolete=1" IF obsolete_attachments %]">Zobrazit vše</a>
           [% END %]
         </span>
       [% END %]
-      [% IF Param("maxattachmentsize") %]
-        <a href="attachment.cgi?bugid=[% bugid %]&amp;action=enter">Připojit soubor</a>
-        (proposed patch, testcase, etc.)
+      [% IF Param("maxattachmentsize") || Param("maxlocalattachment") %]
+        <a href="attachment.cgi?bugid=[% bugid %]&amp;action=enter">Připojit přílohu</a>
+        (navržená záplata/patch, testovací případ, atd.)
       [% END %]
     </td>
   </tr>

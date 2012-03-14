@@ -30,14 +30,14 @@
 
 [% PROCESS global/header.html.tmpl
            title = "$terms.Bugzilla - Správa bonmotů"
-           header = "Přidejte vlastní titulek"
+           header = "Přidejte vlastní moudrý titulek"
  %]
 
 [% IF added_quip %]
   <p>
     <font color="red">
       Váš bonmot '<tt>[% added_quip FILTER html %]</tt>' byl přidán.
-      [% IF Param("quip_list_entry_control") == "moderated" AND !user.in_group('admin') %]
+      [% IF Param("quip_list_entry_control") == "moderated" AND !user.in_group('bz_quip_moderators') %]
         Bonmot bude zobrazen jakmile bude schválen.
       [% END %]
     </font>
@@ -53,39 +53,40 @@
 [% END %]
 
 [% IF approved or unapproved %]
-  <p>[% approved.size %] bonmotů bylo schváleno a [% unapproved.size %] bonmotů bylo neschváleno.</p>
+  <p>[% approved.size %] bonmotů schváleno bylo a [% unapproved.size %] bonmotů schváleno nebylo.</p>
 [% END %]
 
 
 <p>
   [% terms.Bugzilla %] zobrazí náhodný bonmot v titulku každého seznamu
-  [% terms.bugsu %].
+  požadavků.
 </p>
 
 [% IF Param("quip_list_entry_control") != "closed" %]
   <p>
-    Můžete přidat bonmot. Napište chytrý, vtipný nebo nudný bonmot
-    (vyhněte se prosím obscéním nebo urážlivých bonmotům) a klikněte na
-    tlačítko.
-    [% IF Param("quip_list_entry_control") == "moderated" AND !user.in_group('admin') %]
-      Bonmot bude před použitím schválen.
+    Můžete přidat bonmot. Napište moudrý, vtipný nebo nudný bonmot
+    (vyhněte se prosím obscéním nebo urážlivých bonmotům) a udeřte tlačítko.
+    [% IF Param("quip_list_entry_control") == "moderated" AND !user.in_group('bz_quip_moderators') %]
+      Váš bonmot bude před použitím nejprve schválen.
     [% END %]
   </p>
 
   <form method="post" action="quips.cgi">
     <input type="hidden" name="action" value="add">
+    <input type="hidden" name="token"
+           value="[% issue_hash_token(['create-quips']) FILTER html %]">
     <input size="80" name="quip">
     <p>
       <input type="submit" id="add" value="Přidat bonmot">
     </p>
   </form>
 [% ELSE %]
-  <p>Žádné nové bonmoty nebyly přidány.
+  <p>Žádné nové bonmoty nemohou být nyní přidány.
   </p>
 [% END %]
 
 [% IF show_quips %]
-  [% IF !user.in_group('admin') %]
+  [% IF !user.in_group('bz_quip_moderators') %]
     <h2>
       Vložené bonmoty:
     </h2>
@@ -120,7 +121,8 @@
               [% "Neznámý" IF NOT users.$userid %]
             </td>
             <td>
-              <a href="quips.cgi?action=delete&amp;quipid=[% quipid FILTER url_quote %]">
+              <a href="quips.cgi?action=delete&amp;quipid=[% quipid FILTER uri %]&amp;token=
+                 [%- issue_hash_token(['quips', quipid]) FILTER uri %]">
                 Delete
               </a>
             </td>
@@ -146,7 +148,7 @@
           }
         }
         document.write(' <input type="button" name="uncheck_all" '
-                      +'value="Odškrtni vše" onclick="SetCheckboxes(false);">');
+                      +'value="Zruš zaškrtnutí všeho" onclick="SetCheckboxes(false);">');
         document.write(' <input type="button" name="check_all" '
                       +'value="Zaškrtni vše" onclick="SetCheckboxes(true);">');
         //--></script>
@@ -157,9 +159,9 @@
   [% END %]
 [% ELSE %]
   <p>
-    Ti kdo mají rádi moudrost, mohou 
-    <a href="quips.cgi?action=show">zobrazit
-    [% IF user.in_group('admin') %]
+    Ti kdož mají rádi moudrost ve velkých dávkách mohou
+    <a href="quips.cgi?action=show">prohlížet
+    [% IF user.in_group('bz_quip_moderators') %]
       a upravovat
     [% END %]
     celý seznam bonmotů</a>.

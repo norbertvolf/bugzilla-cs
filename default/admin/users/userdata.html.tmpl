@@ -83,15 +83,15 @@
   </tr>
   [% END %]
   <tr>
-    <th><label for="disable_mail">[% terms.Bug %]mail deaktivován:</label></th>
+    <th><label for="disable_mail">Neposílat maily:</label></th>
     <td>
       <input type="checkbox" name="disable_mail" id="disable_mail" value="1" 
       [% IF otheruser.email_disabled %] checked="checked" [% END %] />
-      (Toto má vliv e-maily, ktereé seuvisí se změnou požadavků, ale emaily nesouvisejicí s požadavky (např. reset hesla) zůstanou funkční.)
+      (Toto nastavení má vliv e-maily, které souvisí se změnou požadavků, ale emaily nesouvisející s požadavky (např. reset hesla) zůstanou funkční.)
     </td>
   </tr>
   <tr>
-    <th><label for="disabledtext">Informace o zablokován:</label></th>
+    <th><label for="disabledtext">Blokace:</label></th>
     <td>
       [% INCLUDE global/textarea.html.tmpl
          name           = 'disabledtext'

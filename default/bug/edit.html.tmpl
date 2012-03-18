@@ -1104,12 +1104,18 @@
 
     [%# For logged-out users %]
     [% ELSE %]
-      <table><tr><td><fieldset>
+      <table>
+        <tr>
+          <td>
+            <fieldset>
         <legend>Poznámka</legend>
         Před přidáním komentáře nebo změnami [% terms.bugu %] se musíte
-        <a href="show_bug.cgi?id=
-                 [%- bug.bug_id %]&amp;GoAheadAndLogIn=1">Přihlásit</a>
-      </fieldset></table><tr></td>
+              <a href="show_bug.cgi?id=
+                      [%- bug.bug_id %]&amp;GoAheadAndLogIn=1">log in</a>
+            </fieldset>
+          </td>
+        </tr> 
+      </table>
     [% END %]
   </div>
 [% END %]

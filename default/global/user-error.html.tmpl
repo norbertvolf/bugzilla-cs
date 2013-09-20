@@ -1,23 +1,9 @@
-[%# The contents of this file are subject to the Mozilla Public
-  # License Version 1.1 (the "License"); you may not use this file
-  # except in compliance with the License. You may obtain a copy of
-  # the License at http://www.mozilla.org/MPL/
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
   #
-  # Software distributed under the License is distributed on an "AS
-  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-  # implied. See the License for the specific language governing
-  # rights and limitations under the License.
-  #
-  # The Original Code is the Bugzilla Bug Tracking System.
-  #
-  # The Initial Developer of the Original Code is Netscape Communications
-  # Corporation. Portions created by Netscape are
-  # Copyright (C) 1998 Netscape Communications Corporation. All
-  # Rights Reserved.
-  #
-  # Contributor(s): Gervase Markham <gerv@gerv.net>
-  #                 Frédéric Buclin <LpSolit@gmail.com>
-  #                 Max Kanat-Alexander <mkanat@bugzilla.org>
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
   #%]
 
 [%# INTERFACE:
@@ -38,8 +24,6 @@
   # Note: be aware of uniqueness of error string parameter value, since
   # nobody can guarantee the hook files processing order in the future.
   #%]
-
-[% PROCESS global/variables.none.tmpl %]
 
 [% PROCESS "global/field-descs.none.tmpl" %]
 
@@ -235,6 +219,11 @@
   [% ELSIF error == "attachment_removed" %]
     [% title = "Příloha odstraněna" %]
     Příloha, ke které se snažíte přistoupit byla již odstraněna.
+ 
+   [% ELSIF error == "bad_page_cgi_id" %]
+     [% title = "Neplatné ID stránky" %]
+     ID <code>[% page_id FILTER html %]</code> není platný
+     valid page identifier.
 
   [% ELSIF error == "bug_access_denied" %]
     [% title = "Přístup odmítnut" %]
@@ -257,7 +246,9 @@
       URL musí začínat "http" nebo "https".
     [% ELSIF reason == 'path_only' %]
       Musíte specifikovat plné URl.
-    [% ELSIF reason == 'show_bug' %]
+    [% ELSIF reason == 'id' %]
+      Na tomto URL se nenachází žádný platný požadavek.
+    [% ELSE %]
       [%+ field_descs.see_also FILTER html %] URL by měly odkazovat na jedno z tohoto:
       <ul>
         <li><code>show_bug.cgi</code> Instalace Bugzilly.</li>
@@ -268,9 +259,9 @@
         <li>Tiket v Trac instalaci.</li>
         <li>Požadavek v MantisBT instalaci.</li>
         <li>Požadavek na sourceforge.net.</li>
+        <li>Požadavek na github.com.</li>
+        [% Hook.process('bug_url_invalid_tracker') %]
       </ul>
-    [% ELSIF reason == 'id' %]
-      Na tomto URL se nenachází žádný platný požadavek.
     [% END %]
 
   [% ELSIF error == "bug_url_too_long" %]
@@ -370,6 +361,11 @@
     Tyto požadavky musíte přiřadit jiné komponentě před
     smazáním této komponenty.
 
+  [% ELSIF error == "component_is_last" %]
+    [% title = BLOCK %]Last Component in this Product[% END %]
+    '[% comp.name FILTER html %]' is the last component of the
+    '[% comp.product.name FILTER html %]' product. You cannot delete it.
+
   [% ELSIF error == "component_name_too_long" %]
     [% title = "Název komponenty je příliš dlouhý" %]
     Název komponenty je limitován na [% constants.MAX_COMPONENT_SIZE FILTER html %]
@@ -436,13 +432,8 @@
     [% title = "Změna emailu již probíhá" %]
     Změna emailu již probíhá; prosím zkontroluje svou e-mailovou schránku.
 
-  [% ELSIF error == "email_confirmation_failed" %]
-    [% title = "Potvrzení emailové adresy selhalo" %]
-    Potvrzení emailové adresy selhalo.
-
   [% ELSIF error == "email_no_text_plain" %]
-    Vaše zpráva neobsahuje žádný text. [% terms.Bugzilla %] nepřijímá
-    emaily v HTML formátu nebo HTML s přílohou.
+    Email neobsahuje žádný text, podle toho co jsme našli.
 
   [% ELSIF error == "empty_group_description" %]
     [% title = "Popis skupiny nemůže být prázdný" %]
@@ -461,10 +452,24 @@
 
   [% ELSIF error == "extension_create_no_name" %]
     Musíte specifikovat název vašeho rozšíření jako argument tohoto skriptu.
+ 
+  [% ELSIF error == "extension_disabled" %]
+     [% title = "Rozšíření je neplatené" %]
+     Nemáte přístup na tuto stránku, protože rozšíření '[% name FILTER html %]'
+     je neplatné.
 
   [% ELSIF error == "extension_first_letter_caps" %]
     První písmeno názvu vašeho rozšíření musí být velké písmeno.
     (Specifikoval jste '[% name FILTER html %]'.)
+
+   [% ELSIF error == "feature_disabled" %]
+     [% install_string("feature_$feature") FILTER html %] vlastnost není
+     k dispozící v této [% terms.Bugzilla %] instalaci.
+     [% IF user.in_group('admin') %]
+       Jestliže chcete povolit tuot vlastnost.  spusťte
+       <kbd>checksetup.pl</kbd> pro zjištění dalších  
+       požadavké této vlastnosti.
+     [% END %]
 
   [% ELSIF error == "field_already_exists" %]
     [% title = "Pole již existuje" %]
@@ -495,6 +500,11 @@
   [% ELSIF error == "field_missing_description" %]
     [% title = "Chybějící popis pole" %]
     Pro toto pole musíte vložit popis.
+
+   [% ELSIF error == "field_long_desc_too_long" %]
+     [% title = "Popisek je pro pole příliš dlouhý" %]
+     Popisek, který poskytujet pro toto poje je delší než
+     [% constants.MAX_FIELD_LONG_DESC_LENGTH FILTER html %] znaků.
 
   [% ELSIF error == "field_missing_name" %]
     [% title = "Chybějící název pole" %]
@@ -612,6 +622,10 @@
     <br>Případně pokud je Vaše příloha obrázek, může pomoci
     ji uložit v komprimovaném formátu (JPG,PNG...) a zkusit
     přílohu připojit znova.
+ 
+  [% ELSIF error == "flag_requestee_disabled" %]
+    [% title = "Značká není požadovatelná pro specifickou osobu" %]
+    Nemůžete se dotazovat specifické osoby na <em>[% type.name FILTER html %]</em>.
 
   [% ELSIF error == "flag_requestee_needs_privs" %]
     [% title = "Flag Requestee Needs Privileges" %]
@@ -718,6 +732,9 @@
     [% title = "Formát nenalezen" %]
     Požadovaný formát <em>[% format FILTER html %]</em> neexistuje
     s typem obsahu <em>[% ctype FILTER html %]</em>.
+    [% IF invalid %]
+      Oba parametry musí obsahovat jen písmena a pomlčky
+    [% END %]
     
   [% ELSIF error == "flag_type_sortkey_invalid" %]
     [% title = "Neplatný řadící klíč typu příznaku" %]
@@ -843,8 +860,7 @@
     [% ELSE %]
       [%+ Param('emailregexpdesc') %]
     [% END %]
-    Také nesmí obsahovat žádný z těchto speciálních znaků:
-    <tt>\ ( ) &amp; &lt; &gt; , ; : &quot; [ ]</tt> a ani žádný bílý znak.
+    Také nesmí obsahovat žádné neplatné znaky
     
   [% ELSIF error == "illegal_frequency" %]
     [% title = "Too Frequent" %]
@@ -903,9 +919,7 @@
     [% END %]
     [% IF bug_id %]
       '[% bug_id FILTER html %]' není platné číslo požadavku
-      [% IF Param("usebugaliases") %]
-        ani jeho alias
-      [% END %].
+       ani jeho alias
     [% ELSE %]
       [% IF field %]
         Pole '[% field_descs.$field FILTER html %]'
@@ -935,6 +949,10 @@
     Invalid datasets <em>[% datasets.join(":") FILTER html %]</em>. Only digits,
     letters and colons are allowed.
 
+  [% ELSIF error == "invalid_dimensions" %]
+    [% title = "Invalid Dimensions" %]
+    The width or height specified is not a positive integer.
+
   [% ELSIF error == "invalid_format" %]
     [% title = "Neplatný formát" %]
     Formát "[% format FILTER html %]" je neplatný (musí být jeden z
@@ -950,6 +968,9 @@
   [% ELSIF error == "invalid_group_name" %]
     [% title = "Neplatný název skupiny" %]
     Skupina ,kterou jsi specifikoval [% name FILTER html %] zde není platná
+
+   [% ELSIF error == "invalid_keyword_id" %]
+     Klíčové ID <em>[% id FILTER html %]</em> nelze nalézt.
 
   [% ELSIF error == "invalid_maxrows" %]
     [% title = "Invalid Max Rows" %]
@@ -967,6 +988,18 @@
   [% ELSIF error == "invalid_regexp" %]
     [% title = "Neplatný regulární výraz" %]
     Tento regulární výraz není platný.
+
+  [% ELSIF error == "invalid_user" %]
+    [% title = "Neplatný uživatel" %]
+    Uživatel
+    [% IF user_id %]
+      s ID <em>[% user_id FILTER html %]</em>
+    [% ELSIF user_login %]
+      se jménem <em>[% user_login FILTER html %]</em>
+    [% ELSE %]
+      předaný
+    [% END %]
+    je neplatný.
 
   [% ELSIF error == "invalid_user_group" %]
     [% title = "Neplatná uživatelská skupina" %]
@@ -1003,6 +1036,8 @@
       [%+ remaining FILTER html %] pokusů, Váš účet bude
       zablokován na 
       [%+ constants.LOGIN_LOCKOUT_INTERVAL FILTER html %] minut.
+      Abyste předečel uzamčení, můžete obnovit své heslo pomocí
+      odkazu "Zapomněl jsem heslo" link.
     [% END %]
 
   [% ELSIF error == "json_rpc_get_method_required" %]
@@ -1108,10 +1143,19 @@
     [% title = "Misarranged Dates" %]
     Your start date ([% datefrom FILTER html %]) is after 
     your end date ([% dateto FILTER html %]).
+
+  [% ELSIF error == "mismatched_bug_ids_on_obsolete" %]
+    Attachment [% attach_id FILTER html %] is attached to another [% terms.bug %],
+    but you tried to flag it as obsolete while creating a new attachment to
+    [%+ terms.bug %] [%+ my_bug_id FILTER html %].
     
   [% ELSIF error == "missing_attachment_description" %]
     [% title = "Chybějící popis přílohy" %]
     Prosím vložte popis přílohy.
+
+  [% ELSIF error == "missing_bug_id" %]
+    [% title = "Missing $terms.Bug ID" %]
+    No [% terms.bug %] ID was given.
     
   [% ELSIF error == "missing_category" %]
     [% title = "Chybějící kategorie" %]
@@ -1138,12 +1182,6 @@
      your browser did not specify a content type when uploading the file, 
      so you must enter a content type manually.
                 
-  [% ELSIF error == "missing_content_type_method" %]
-    [% title = "Missing Content-Type Determination Method" %]
-    You must choose a method for determining the content type,
-    either <em>auto-detect</em>, <em>select from list</em>, or <em>enter 
-    manually</em>.
-        
   [% ELSIF error == "missing_cookie" %]
     [% title = "Missing Cookie" %]
     Sorry, I seem to have lost the cookie that recorded
@@ -1175,6 +1213,10 @@
     [% ELSE %]
       does not exist.
     [% END %]
+
+  [% ELSIF error == "need_quipid" %]
+    [% title = "Chybějící ID tipu" %]
+    Je požadováno platné ID tipu
 
   [% ELSIF error == "missing_resolution" %]
     [% title = "Resolution Required" %]
@@ -1439,6 +1481,27 @@
     [% title = "Query Name Too Long" %]
     The name of the query must be less than [% constants.MAX_LEN_QUERY_NAME FILTER html %]
     characters long.
+ 
+  [% ELSIF error == "quicksearch_invalid_query" %]
+    [% title = "Invalid Query" %]
+    Your query is invalid.
+    [% IF operators %]
+      The [% operators.shift FILTER html %] operator cannot be followed by
+      [%+ operators.shift FILTER html %].
+    [% ELSE %]
+      A query cannot start with AND or OR, nor can it end with AND, OR or NOT.
+      They are reserved operators and must be quoted if you want to look for
+      these strings.
+    [% END %]
+
+  [% ELSIF error == "quicksearch_unbalanced_quotes" %]
+    [% title = "Badly Formatted Query" %]
+    [% terms.Bugzilla %] is unable to parse your query correctly:
+    <em>[% string FILTER html %]</em>.<br>
+    If you use quotes to enclose strings, make sure both quotes are present.
+    If you really want to look for a quote in a string, type \" instead of ".
+    For instance, <em>"I'm so \"special\", really"</em> (with quotes) will be
+    interpreted as <em>I'm so "special", really</em>.
 
   [% ELSIF error == "quicksearch_unknown_field" %]
     [% title = "QuickSearch Error" %]
@@ -1456,10 +1519,32 @@
         <a href="page.cgi?id=quicksearch.html#fields">listed here</a>.</p>
     [% END %]
 
+  [% ELSIF error == "quip_too_long" %]
+    [% title = "Quip Too Long" %]
+    You entered a quip with a length of [% length FILTER none %] characters, 
+    but the maximum allowed length is [% constants.MAX_QUIP_LENGTH FILTER none %] 
+    characters.
+
   [% ELSIF error == "reassign_to_empty" %]
     [% title = "Illegal Reassignment" %]
     To reassign [% terms.abug %], you must provide an address for
     the new assignee.
+ 
+  [% ELSIF error == "report_axis_invalid" %]
+    [% title = "Invalid Axis" %]
+    <em>[% val FILTER html %]</em> is not a valid value for
+    [%+ IF    fld == "x" %]the horizontal axis
+    [%+ ELSIF fld == "y" %]the vertical axis
+    [%+ ELSIF fld == "z" %]the multiple tables/images
+    [%+ ELSE %]a report axis[% END %] field.
+
+  [% ELSIF error == "report_name_missing" %]
+    [% title = "No Report Name Specified" %]
+    You must enter a name for your report.
+
+  [% ELSIF error == "report_access_denied" %]
+    [% title = "Report Access Denied" %]
+    You cannot access this report.
 
   [% ELSIF error == "require_component" %]
     [% title = "Je zapotřebí vybrat komponentu" %]
@@ -1509,6 +1594,17 @@
     and the "matches" search can only be used with the "content"
     field.
 
+  [% ELSIF error == "search_grouped_field_invalid" %]
+    [% terms.Bugzilla %] does not support using the 
+    "[%+ field_descs.$field FILTER html %]" ([% field FILTER html %])
+    field with grouped search conditions.
+
+  [% ELSIF error == "search_grouped_invalid_nesting" %]
+    You cannot nest clauses within grouped search conditions.
+
+  [% ELSIF error == "search_grouped_field_mismatch" %]
+    All conditions under a groups search must use the same field.
+
   [% ELSIF error == "search_field_operator_invalid" %]
     [% terms.Bugzilla %] does not support using the 
     "[%+ field_descs.$field FILTER html %]" ([% field FILTER html %])
@@ -1529,7 +1625,11 @@
     
   [% ELSIF error == "still_unresolved_bugs" %]
     [% title = "Unresolved Dependencies" %]
-    [% terms.Bug %] [%+ bug_id FILTER bug_link(bug_id) FILTER none %]
+    [% IF bug_id %]
+      [% terms.Bug %] [%+ bug_id FILTER bug_link(bug_id) FILTER none %]
+    [% ELSE %]
+       This [% terms.bug %]
+    [% END %]
     has [% dep_count FILTER none %] unresolved
     [% IF dep_count == 1 %]
       dependency
@@ -1597,7 +1697,9 @@
     [% ELSIF type == "account" %]
       an account
     [% END %]
-    token too recently to request another. Please wait a while and try again.
+    token too recently to request another. 
+    Please wait [% constants.ACCOUNT_CHANGE_INTERVAL FILTER html %] minutes
+    then try again.
 
   [% ELSIF error == "unknown_action" %]
     [% IF action %]
@@ -1609,6 +1711,11 @@
   [% ELSIF error == "unknown_tab" %]
     [% title = "Unknown Tab" %]
     <code>[% current_tab_name FILTER html %]</code> is not a legal tab name.
+
+  [% ELSIF error == "value_inactive" %]
+    [% title = "Value is Not Active" %]
+    [% type = BLOCK %][% INCLUDE object_name class = class %][% END %]
+    The [% type FILTER html %] value '[% value FILTER html %]' is not active.
 
   [% ELSIF error == "version_already_exists" %]
     [% title = "Version Already Exists" %]
@@ -1625,6 +1732,11 @@
     There are [% nb FILTER html %] [%+ terms.bugs %] associated with this
     version! You must reassign those [% terms.bugs %] to another version
     before you can delete this one.
+
+  [% ELSIF error == "version_is_last" %]
+    [% title = BLOCK %]Last Version in this Product[% END %]
+    '[% version.name FILTER html %]' is the last version of the
+    '[% version.product.name FILTER html %]' product. You cannot delete it.
 
   [% ELSIF error == "users_deletion_disabled" %]
     [% title = "Deletion not activated" %]
@@ -1693,6 +1805,11 @@
     "[% value FILTER html %]" is not a valid value for a
     &lt;[% type FILTER html %]&gt; field. (See the XML-RPC specification
     for details.)
+ 
+  [% ELSIF error == "xmlrpc_illegal_content_type" %]
+    When using XML-RPC, you cannot send data as
+    [%+ content_type FILTER html %]. Allowed content types 
+    are [% constants.XMLRPC_CONTENT_TYPE_WHITELIST.join(', ') FILTER html %].
 
   [% ELSIF error == "zero_length_file" %]
     [% title = "File Is Empty" %]
@@ -1790,6 +1907,10 @@
     příloha
   [% ELSIF class == "Bugzilla::User" %]
     uživatel
+  [% ELSIF class == "Bugzilla::Classification" %]
+    klasifikace
+  [% ELSIF class == "Bugzilla::Product" %]
+    produkt
   [% ELSIF class == "Bugzilla::Component" %]
     komponenta
   [% ELSIF class == "Bugzilla::Version" %]
@@ -1808,8 +1929,6 @@
     skupina
   [% ELSIF class == "Bugzilla::Keyword" %]
     klíčové slovo
-  [% ELSIF class == "Bugzilla::Product" %]
-    produkt
   [% ELSIF class == "Bugzilla::Search::Recent" %]
     poslední hledání
   [% ELSIF class == "Bugzilla::Search::Saved" %]
@@ -1818,4 +1937,5 @@
     [% SET field_name = matches.0 %]
     [% field_descs.$field_name FILTER html %]
   [% END %]
+  [% Hook.process('end_object_name', 'global/user-error.html.tmpl') %]
 [% END %]

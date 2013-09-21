@@ -1,22 +1,12 @@
-[%# The contents of this file are subject to the Mozilla Public
-  # License Version 1.1 (the "License"); you may not use this file
-  # except in compliance with the License. You may obtain a copy of
-  # the License at http://www.mozilla.org/MPL/
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
   #
-  # Software distributed under the License is distributed on an "AS
-  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-  # implied. See the License for the specific language governing
-  # rights and limitations under the License.
-  #
-  # The Original Code is the Bugzilla Bug Tracking System.
-  #
-  # Contributor(s): Shane H. W. Travis <travis@sedsystems.ca>
-  #
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
   #%]
 
 [%# Remember to PROCESS rather than INCLUDE this template. %]
-
-[% PROCESS global/variables.none.tmpl %]
 
 [% setting_descs = { 
    "comment_sort_order"               => "Při prohlížení $terms.bugsu zobrazit komentáře v tomto pořadí",
@@ -28,7 +18,6 @@
    "off"                              => "Vypnuto",
    "oldest_to_newest"                 => "Vzestupně",
    "on"                               => "Zapnuto",
-   "per_bug_queries"                  => "Povolit štítky",
    "post_bug_submit_action"           => "Po změně $terms.bugu",
    "next_bug"                         => "Zobrazit další $terms.bug v seznamu",
    "same_bug"                         => "Zobrazit změněný $terms.bug",
@@ -52,6 +41,8 @@
    "email_format"                     => "Formát emailů",
    "html"                             => "HTML",
    "text_only"                        => "Prostý text",
+   "requestee_cc"                     => "Přidat mě automaticky do kopie. Chci revidovat $terms.bugs",
+   "bugmail_new_prefix"               => "Přidat 'Nový:' do předmětu emailu poslaného když je vytvořen nový $terms.bug",
                    } 
 %]
 

@@ -1,31 +1,14 @@
-[%# The contents of this file are subject to the Mozilla Public
-  # License Version 1.1 (the "License"); you may not use this file
-  # except in compliance with the License. You may obtain a copy of
-  # the License at http://www.mozilla.org/MPL/
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
   #
-  # Software distributed under the License is distributed on an "AS
-  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-  # implied. See the License for the specific language governing
-  # rights and limitations under the License.
-  #
-  # The Original Code is the Bugzilla Bug Tracking System.
-  #
-  # The Initial Developer of the Original Code is Netscape Communications
-  # Corporation. Portions created by Netscape are
-  # Copyright (C) 1998 Netscape Communications Corporation. All
-  # Rights Reserved.
-  #
-  # Contributor(s): Gervase Markham <gerv@gerv.net>
-  #                 Max Kanat-Alexander <mkanat@bugzilla.org>
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
   #%]
 
 [%# This is a list of all the possible messages. Please keep them in
   # alphabetical order by message tag, and leave a blank line between messages.
   #%]
-
-[% PROCESS global/variables.none.tmpl %]
-
-[% PROCESS "global/field-descs.none.tmpl" %]
 
 [% message_tag = message %]
 
@@ -439,6 +422,8 @@
           [% CASE 'visible_to_me_remove' %]
             <li>This group may no longer see users in the following groups:
               [%+ changes.visible_to_me_remove.join(', ') FILTER html %]</li>
+          [% CASE %]
+            [% Hook.process('group_updated_fields') %]
         [% END %]
       [% END %]
       </ul>
@@ -484,8 +469,9 @@
     [% title = "Logged Out" %]
     [% url = "index.cgi?GoAheadAndLogIn=1" %]
     [% link = "Log in again." %]
-    <b>Vaše heslo v cookies bylo zapomenuto</b>.
-    Příště budete vyzváni k zadání jména a hesla jakmile to bude třeba.
+    <b>Byl jste úspěšně odhlášen</b>.
+    Cookie s vaším příhlášením je smazáni. Budete vyzvání
+    k&nbsp;přihlášení jakmile to bude nutné.
 
   [% ELSIF message_tag == "login_changed" %]
     [% title = "$terms.Bugzilla Login Changed" %]
@@ -795,9 +781,7 @@
 
   [% ELSIF message_tag == "product_created" %]
     [% title = "Product Created" %]
-    The product <em>[% product.name FILTER html %]</em> has been created. You will need to
-    <a href="editcomponents.cgi?action=add&product=[% product.name FILTER uri %]">
-    add at least one component</a> before anyone can enter [% terms.bugs %] against this product.
+    Produkt <em>[% product.name FILTER html %]</em> je vytvořen.
 
   [% ELSIF message_tag == "product_deleted" %]
     [% title = "Product Deleted" %]
@@ -814,10 +798,19 @@
     or you don't have access to it. The following is a list of the
     products you can choose from.
 
+  [% ELSIF message_tag == "report_created" %]
+    OK, you have a new saved report named <em>[% reportname FILTER html %]</em>.
+
+  [% ELSIF message_tag == "report_deleted" %]
+    OK, the <em>[% reportname FILTER html %]</em> report is gone.
+
+  [% ELSIF message_tag == "report_updated" %]
+    The saved report <em>[% reportname FILTER html %]</em> has been updated.
+
   [% ELSIF message_tag == "remaining_time_zeroed" %]
-    Pole [% field_descs.remaining_time FILTER html %] bylo automaticky vynulováno 
-    jako součást procesu uzavření [% terms.bugu %]
-    nebo při přesunu z jednoho uzavřeného stavu do jiného.
+    Pole [% field_descs.remaining_time FILTER html %] je vynulováno.
+    Je to součást procesu, kdy je [% terms.bug %] ukončen
+    nebo změněn jeho stav na jiný stav, který znamená ukončení.
 
   [% ELSIF message_tag == "sanitycheck" %]
     [%# We use this way to call sanitycheck-specific messages so that
@@ -867,18 +860,6 @@
       <p>For security reasons, you have been logged out automatically.
       The cookie that was remembering your login is now gone.
     [% END %]
-
-  [% ELSIF message_tag == "tag_updated" %]
-    [% title = "Tag Updated" %]
-    The '<a href="buglist.cgi?tag=[% tag FILTER uri %]">[% tag FILTER html %]</a>'
-    tag has been
-    [% IF action == "add" %]
-      added to
-    [% ELSE %]
-      removed from
-    [% END %]
-    [%+ buglist.size > 1 ? terms.bugs : terms.bug %]
-    [%+ buglist.join(", ") FILTER html %].
 
   [% ELSIF message_tag == "term" %]
     [% terms.$term FILTER html %]

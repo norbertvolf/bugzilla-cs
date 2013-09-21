@@ -1,29 +1,19 @@
-[%# The contents of this file are subject to the Mozilla Public
-  # License Version 1.1 (the "License"); you may not use this file
-  # except in compliance with the License. You may obtain a copy of
-  # the License at http://www.mozilla.org/MPL/
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
   #
-  # Software distributed under the License is distributed on an "AS
-  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-  # implied. See the License for the specific language governing
-  # rights and limitations under the License.
-  #
-  # The Original Code is the Bugzilla Bug Tracking System.
-  #
-  # Contributor(s): Christian Reis <kiko@async.com.br>
-  #                 Frédéric Buclin <LpSolit@gmail.com>
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
   #%]
-
-[% PROCESS "global/field-descs.none.tmpl" %]
 
 [% title = "Shrnutí času " %]
 [% IF do_depends %]
     [% title = title _ "pro " %]
     [% header = "$terms.Bug $ids.0" FILTER bug_link(ids.0) FILTER none %]
-    [% header = title _ header _ " (a blokujících $terms.bugsu)" %]
+    [% header = title _ header _ " (a $terms.bugs, které ho blokují)" %]
     [% title = title _ "$terms.Bug $ids.0" %]
 [% ELSE %]
-    [% title = title _ "(vybráno $ids.size $terms.bugsu)" %]
+    [% title = title _ "($ids.size $terms.bugs jsou vybrány)" %]
     [% header = title %]
 [% END %]
 
@@ -78,7 +68,7 @@
 
   [% IF null.size > 0 %]
     [% INCLUDE inactive_report %]
-    <h4 style="margin: 0">Celková [% null.size %] neaktivních [% terms.bugsu %]</h4>
+    <h4 style="margin: 0">Neaktivní [% terms.bugs %] [% null.size %]</h4>
   [% END %]
 
 [% END %]
@@ -313,25 +303,25 @@
   <input type="radio" name="group_by" id="number" value="number" [%+
     'checked="checked"' IF group_by == "number"
   %]><label 
-  for="number" accesskey="s">Čí<u>s</u>la požadavku</label>
+  for="number" accesskey="n">[% terms.Bug %] číslo</label>
   <input type="radio" name="group_by" id="owner" value="owner" [%+
     'checked="checked"' IF group_by == "owner"
   %]><label 
-  for="owner" accesskey="v"><u>V</u>ývojář</label>
+  for="owner" accesskey="d">Vývojář</label>
 </td><td colspan="2">
   <label for="ctype"><b>Formát</b></label>: <select name="ctype" id="ctype">
-    <option value="html">HTML report</option>
+    <option value="html">HTML sestava</option>
   </select>
 </td></tr><tr>
 <td>&nbsp;</td><td colspan="4">
   <input type="checkbox" name="monthly" [% 'checked="checked"' IF
       monthly %] id="monthly">
-  <label for="monthly" accesskey="m">Rozdělit podle <u>m</u>ěsíců</label>
+  <label for="monthly" accesskey="m">>Rozdělit podle <u>m</u>ěsíců</label>
   [%# XXX: allow splitting by other intervals %]
   &nbsp;
   <input type="checkbox" name="detailed" [% 'checked="checked"' IF
       detailed %] id="detailed">
-  <label for="detailed" accesskey="t">De<u>t</u>ailní souhrny</label>
+  <label for="detailed" accesskey="t">De<u>t</u>ailní shrnutí</label>
   &nbsp;
   <input type="checkbox" name="inactive" [% 'checked="checked"' IF
       inactive %] id="inactive">
@@ -342,10 +332,10 @@
 
 </form>
 <script type="text/javascript">
-<!--
-  createCalendar('start_date');
-  createCalendar('end_date');
-  document.forms['summary'].start_date.focus();
-//--></script>
+  <!--
+    [%+ PROCESS "global/calendar.js.tmpl" id = 'start_date' %]
+    [% PROCESS "global/calendar.js.tmpl" id = 'end_date' %]
+    document.forms['summary'].start_date.focus();
+  //--></script>
 <hr noshade size=1>
 [% END %]

@@ -1,21 +1,9 @@
-[%# The contents of this file are subject to the Mozilla Public
-  # License Version 1.1 (the "License"); you may not use this file
-  # except in compliance with the License. You may obtain a copy of
-  # the License at http://www.mozilla.org/MPL/
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
   #
-  # Software distributed under the License is distributed on an "AS
-  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-  # implied. See the License for the specific language governing
-  # rights and limitations under the License.
-  #
-  # The Original Code is the Bugzilla Bug Tracking System.
-  #
-  # The Initial Developer of the Original Code is Netscape Communications
-  # Corporation. Portions created by Netscape are
-  # Copyright (C) 1998 Netscape Communications Corporation. All
-  # Rights Reserved.
-  #
-  # Contributor(s): Gervase Markham <gerv@gerv.net>
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
   #%]
 
 [%# INTERFACE:
@@ -40,13 +28,13 @@
   </script>
 [% END %]
 
-<p>Toto jsou vaše uložená hledání:</p>
+<p>Your saved searches are as follows:</p>
 
 <blockquote>
   <table border="1" cellpadding="3">  
     <tr>
       <th>
-        Hledání
+        Hledat
       </th>
       <th>
         Spustit
@@ -58,7 +46,8 @@
         Zapomenout
       </th>
       <th>
-        Zobrazit v patičce
+        Zobrazit v
+        patičce
       </th>
       [% may_share = user.in_group(Param('querysharegroup')) && queryshare_groups.size %]
       [% IF may_share %]
@@ -68,7 +57,7 @@
       [% END %]
     </tr>
     <tr>
-      <td>Mé požadavky</td>
+      <td>Mé [% terms.bugs %]</td>
       <td>
         [% filtered_username = user.login FILTER uri %]
         <a href="[% Param('mybugstemplate').replace('%userid%', filtered_username) %]">Run</a>
@@ -148,17 +137,19 @@
     [% END %]
   </table>
 [% IF user.can_bless %]
-  <p>Pamatujte že pro všechna hledání u kterých zvolíte 'Přidat do patičky' se uživatelům přiřazených do skupiny zobrazí odkaz v patičce</p>
+  <p>Poznámka pro všechny uložená hledání přidáaná pomocí příkazu 'Přidat do patičky'
+     Odkaz bude sdílen a přidán do patičky všem uživatelům
+     ve skupině ve chvíli kdy kliknete na tlačítko "Uložit".</p>
 [% END %]
 </blockquote>
 
 [% IF user.queries_available.size %]
-  <p>Můžete používat tato uložená sdílená hledání ostatních uživatelů:</p>
+  <p>You may use these searches saved and shared by others:</p>
 
   <table border="1" cellpadding="3">  
     <tr>
       <th>
-        Hledání
+        Hledat
       </th>
       <th>
         Sdíleno kým
@@ -173,7 +164,8 @@
         Upravit
       </th>
       <th>
-	Zobrazit v patičce
+        Zobrazit v
+        patičce
       </th>
     </tr>
     [% FOREACH q = user.queries_available %]

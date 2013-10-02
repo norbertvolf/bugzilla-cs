@@ -181,8 +181,8 @@
       [% IF user.is_timetracker &&
             (comment.work_time > 0 || comment.work_time < 0) %]
          <br>
-         Additional hours worked: 
-         [% PROCESS formattimeunit time_unit=comment.work_time %]
+         Odpracováno: 
+         [% PROCESS formattimeunit time_unit=comment.work_time %] hodin
       [% END %]
 
 [%# Don't indent the <pre> block, since then the spaces are displayed in the

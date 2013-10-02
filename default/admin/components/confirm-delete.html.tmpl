@@ -1,0 +1,149 @@
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  #
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
+  #%]
+
+[%# INTERFACE:
+  # comp: object; Bugzilla::Component object representing the component the
+  #               user wants to delete.
+  # product: object; Bugzilla::Product object representing the product to
+  #               which the component belongs.
+  #%]
+
+[% title = BLOCK %]Delete component '[% comp.name FILTER html %]'
+from '[% product.name FILTER html %]' product
+  [% END %]
+
+[% PROCESS global/header.html.tmpl
+  title = title
+  style_urls = ['skins/standard/admin.css']
+%]
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr bgcolor="#6666FF">
+  <th valign="top" align="left">Pole</th>
+  <th valign="top" align="left">Hodnota</th>
+</tr>
+<tr>
+  <td valign="top">Komponenta:</td>
+  <td valign="top">[% comp.name FILTER html %]</td>
+</tr>
+<tr>
+  <td valign="top">Popis komponenty:</td>
+  <td valign="top">[% comp.description FILTER html_light %]</td>
+</tr>
+<tr>
+  <td valign="top">Výchozí příjemce:</td>
+  <td valign="top">[% comp.default_assignee.login FILTER html %]</td>
+  
+[% IF Param('useqacontact') %]
+</tr>
+<tr>
+  <td valign="top">Výchozí QA:</td>
+  <td valign="top">[% comp.default_qa_contact.login FILTER html %]</td>
+[% END %]
+  
+</tr>
+<tr>
+  <td valign="top">Produkt komponenty:</td>
+  <td valign="top">[% product.name FILTER html %]</td>
+
+[% IF product.description %]
+</tr>
+<tr>
+  <td valign="top">Popis produktu:</td>
+  <td valign="top">[% product.description FILTER html_light %]</td>
+[% END %]
+
+[% IF Param('usetargetmilestone') %]
+</tr>
+<tr>
+  <td valign="top">URL Milníku priduktu:</td>
+  <td valign="top">
+    <a href="[% product.milestone_url FILTER html %]">
+      [% product.milestone_url FILTER html %]
+    </a>
+  </td>
+[% END %]
+
+</tr>
+<tr>
+  <TD VALIGN="top">Zadávat [% terms.bugs %] je povoleno:</TD>
+  <TD VALIGN="top">[% IF product.is_active && comp.isactive %]Ano[% ELSE %]Ne[% END %]</td>
+</tr>
+<tr>
+  <td valign="top">[% terms.Bugs %]:</td>
+  <td valign="top">
+[% IF comp.bug_count %]
+  <a title="List of [% terms.bugs %] for component '[% comp.name FILTER html %]'"
+     href="buglist.cgi?component=[% comp.name FILTER uri %]&amp;product=
+          [%- product.name FILTER uri %]">[% comp.bug_count %]</a>
+[% ELSE %]
+  Žádný
+[% END %]
+  </td>
+</tr>
+</table>
+
+<h2>Potvrzení</h2>
+  
+[% IF comp.bug_count %]
+
+  [% IF !Param("allowbugdeletion") %]
+  <p class="confirmation">
+    Promiňte,
+
+    [% IF comp.bug_count > 1 %] 
+       ale ke komponentě jsou přiřazeny [%+ terms.bugs %] v počtu [% comp.bug_count %].
+    [% ELSE %]
+       ale ke komponentě je přiřazen [% comp.bug_count %] [%+ terms.bug %].
+    [% END %]
+
+    Musítš přesunout
+
+    [% IF comp.bug_count > 1 %]
+       [% terms.bugs %] 
+    [% ELSE %]
+       [% terms.bug %]
+    [% END %]
+
+    k jiné komponentě před jejím smazáním.
+  </p>
+  [% ELSE %]
+
+    <table border="0" cellpadding="20" width="70%" bgcolor="red"><tr><td>
+
+      [% IF comp.bug_count > 1 %] 
+        [% comp.bug_count %] [%+ terms.bugs %] jsou přiřazeny
+      [% ELSE %]
+        1 [% terms.bug %] je přiřazen
+      [% END %]
+      k této komponentě!  Když smažete
+      komponentu, <b>Všechny</b> uložené [% terms.bugs %] a
+      jejich historie budou vymazány.
+      </td></tr></table>
+
+  [% END %]
+
+[% END %]
+
+[% IF comp.bug_count == 0 || Param('allowbugdeletion') %]
+
+  <p>Opravdu chcete smazat komponentu?</p>
+  
+  <form method="post" action="editcomponents.cgi">
+  <input type="submit" id="delete" value="Ano, smazat">
+  <input type="hidden" name="action" value="delete">
+  <input type="hidden" name="product" value="[% product.name FILTER html %]">
+  <input type="hidden" name="component" value="[% comp.name FILTER html %]">
+  <input type="hidden" name="token" value="[% token FILTER html %]">
+  </form>
+
+[% END %]
+
+[% PROCESS admin/components/footer.html.tmpl %]
+
+[% PROCESS global/footer.html.tmpl %] 

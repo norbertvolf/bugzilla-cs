@@ -67,12 +67,12 @@
 
 <div class="bz_query_head">
   <span class="bz_query_timestamp">
-    [% currenttime FILTER time('%a %b %e %Y %T %Z') FILTER html %]<br>
+    [% currenttime FILTER time('%d.%m.%Y %T %Z') FILTER html %]<br>
   </span>
 
   [% IF debug %]
     <div class="bz_query_debug">
-      <p>Total execution time: [% query_time FILTER html %] sekund</p>
+      <p>Celkový čas provádění: [% query_time FILTER html %] sekund</p>
       [% FOREACH query = queries %]
         <p>[% query.sql FILTER html %]</p>
         <p>Execution time: [% query.time FILTER html %] sekund</p>

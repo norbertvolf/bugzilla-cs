@@ -49,7 +49,7 @@
                      [% q.user.id FILTER uri %]"
                class="shared"
                title="Nasdíleno od [% q.user.identity FILTER html %]"
-               >[% q.name FILTER html FILTER no_break %]</a></li>
+               >[% q.name FILTER html %]</a></li>
           [% print_pipe = 1 %]
         [% END %]
       </ul>

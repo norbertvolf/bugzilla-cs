@@ -284,28 +284,28 @@
       <ul>
         <li><code>show_bug.cgi</code> Instalace systému
            [% terms.Bugzilla %].</li>
-        <li>Pož[% %]adavek na launchpad.net</li>
+        <li>Požadavek na launchpad.net</li>
         <li>Téma na code.google.com</li>
-        <li>Pož[% %]adavek na b[% %]ugs.debian.org</li>
+        <li>Požadavek na bugs.debian.org</li>
         <li>Téma v systému JIRA</li>
         <li>Tiket v systému TRAC</li>
-        <li>Pož[% %]adavek v systému MantisBT</li>
-        <li>Pož[% %]adavek na sourceforge.net</li>
+        <li>Požadavek v systému MantisBT</li>
+        <li>Požadavek na sourceforge.net</li>
         <li>Téma/pull request na github.com</li>
         [% Hook.process('bug_url_invalid_tracker') %]
       </ul>
     [% END %]
 
   [% ELSIF error == "bug_url_too_long" %]
-    [% title = "Neplatné URL [% terms.bugu %]" %]
+    [% title = "Neplatné URL" _ terms.bugu %]
     URL [% terms.bugsu %] nemohou být delší než
     [%+ constants.MAX_BUG_URL_LENGTH FILTER none %] znaků.
     <code>[% url FILTER html %]</code> je příliš dlouhé.
 
   [% ELSIF error == "buglist_parameters_required" %]
     [% title = "Vyžadovány parametry" %]
-    [% docslinks = {'query.html' => "Hledání [% terms.bugsu %]",
-                    'query.html#list' => "Seznamy [% terms.bugsu %]"} %]
+    [% docslinks = {'query.html' => "Hledání " _ terms.bugsu,
+                    'query.html#list' => "Seznamy" _ terms.bugsu } %]
     Nemůžete vyhledávat, nebo vytvářet uložená hledání bez vložení parametrů vyhledávání.
 
   [% ELSIF error == "cc_remove_denied" %]
@@ -461,11 +461,11 @@
     [% terms.Bug %] nemůže sám sebe blokovat nebo na sobě záviset.
 
   [% ELSIF error == "dupe_id_required" %]
-    [% title = "ID duplikovaného [% terms.bugu %] musí být vyplněno" %]
+    [% title = "ID duplikovaného" _ terms.bugu _ "musí být vyplněno" %]
     Musíte specifikovat ID [% terms.bugu %], pro který je tento [% terms.bug %] duplikátem.
 
   [% ELSIF error == "dupe_not_allowed" %]
-    [% title = "Není možno označit [% terms.bugs %] jako duplikáty" %]
+    [% title = "Není možno označit " _ terms.bugs _ " jako duplikáty" %]
     Nemůžete označit [% terms.bug %] jako duplikát když
     měníte několik [% terms.bugsu %] najednou.
 
@@ -888,7 +888,7 @@
     [%+ bug_id FILTER html %].
          
   [% ELSIF error == "illegal_bug_status_transition" %]
-    [% title = "Nepovolená změna stavu [% terms.bugu %]" %]
+    [% title = "Nepovolená změna stavu " _ terms.bugu %]
     [% IF old.defined %]
       Nejste oprávněni ke změně stavu [% terms.bugu %]
       z [%+ old.name FILTER html %] na [% new.name FILTER html %].
@@ -1295,7 +1295,7 @@
                 
   [% ELSIF error == "missing_query" %]
     [% title = "Chybějící hledání" %]
-    [% docslinks = {'query.html' => "Hledání [% terms.bugsu %]",
+    [% docslinks = {'query.html' => "Hledání " _ terms.bugsu ,
                     'query.html#list' => "$terms.Bug lists"} %]
     The search named <em>[% queryname FILTER html %]</em>
     [% IF sharer_id && sharer_id != user.id %]

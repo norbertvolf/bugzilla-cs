@@ -14,7 +14,6 @@
     #%]
   [% time_unit = time_unit FILTER format('%.2f') %]
   [% time_unit.replace('0\Z', '') %]
-  [% time_unit.replace(',', '.') %]
 [% END %]
 
 [% BLOCK calculatepercentage %]

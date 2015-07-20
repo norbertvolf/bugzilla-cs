@@ -12,7 +12,8 @@
   #%]
 
 [% PROCESS global/header.html.tmpl
-  title = "Vyber produkt jehož komponentu chcete upravit?"
+  title = "Vyber produkt jehož komponentu chcete upravit"
+  style_urls = ['skins/standard/admin.css']
 %]
 
 [% columns = [
@@ -34,7 +35,7 @@
   [% columns.push({
       name => 'bug_count'
       heading => "$terms.Bugs"
-      align => "right"
+      class => "right"
       contentlink => "buglist.cgi?product=%%name%%"
     })
   %]

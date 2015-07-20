@@ -20,8 +20,7 @@
 
 [% DEFAULT type="bug" %]
 
-[% Link = BLOCK %][% "$terms.Bug $id" FILTER bug_link(id) %][% END %]
-[% link = BLOCK %][% "$terms.bug $id" FILTER bug_link(id) %][% END %]
+[% link = BLOCK %][% terms.bug %] [%+ id FILTER bug_link(id) FILTER none %][% END %]
 
 [%
   title = {
@@ -36,7 +35,7 @@
 [% Hook.process('title') %]
 
 <dl>
-  <dt>[% title.$type %]</dt>
+  <dt>[% title.$type.ucfirst %]</dt>
   <dd>
     [% PROCESS "bug/process/bugmail.html.tmpl" mailing_bugid = id %]
     [%# Links to more information about the changed bug. %]

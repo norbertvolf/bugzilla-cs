@@ -22,7 +22,7 @@
 [%# If the user's bugmail has been disabled by admins, show a warning. %]
 [% IF user.email_disabled %]
   <div class="warningmessages">
-    Váš e-mail administrátor zneplatníl pro použití v aplikaci  
+    Váš e-mail administrátor zneplatnil pro zasílání [% terms.bugsu %] v aplikaci  
     [% terms.Bugzilla %]. Kontatkutjte administrátora [% Param('maintainer') %]
     pro jeho opětovné povolení.
   </div>
@@ -45,7 +45,10 @@
 function SetCheckboxes(setting) {
   for (var count = 0; count < document.userprefsform.elements.length; count++) {
     var theinput = document.userprefsform.elements[count];
-    if (theinput.type == "checkbox" && !theinput.disabled) {
+    if (theinput.type == "checkbox"
+        && !theinput.disabled
+        && !theinput.name.match("remove_ignored_bug"))
+    {
       if (theinput.name.match("neg")) {
         theinput.checked = !setting;
       }
@@ -55,71 +58,48 @@ function SetCheckboxes(setting) {
     }
   }
 }
-
-document.write('<input type="button" value="Povolit všechny e-maily" onclick="SetCheckboxes(true); return false;">\n');
-document.write('<input type="button" value="Zakázat všechny e-maily" onclick="SetCheckboxes(false); return false;">\n');
 // -->
 </script>
 
+<input type="button" value="Povolit všechny e-maily" onclick="SetCheckboxes(true); return false;">
+<input type="button" value="Zakázat všechny e-maily" onclick="SetCheckboxes(false); return false;">
+
 <hr>
 
-<table>
-  <tr>
-    <td colspan="2">
-      <b>Obecné volby:</b>
-    </td>
-  </tr>
+<h3>Obecné volby</h3>
 
-  <tr>
-    <td width="150"></td>
-    <td>
-      [% prefname = "email-$constants.REL_ANY-$constants.EVT_FLAG_REQUESTED" %]
-      <input type="checkbox" name="[% prefname %]" id="[% prefname %]" 
-        value="1"
-        [% " checked"
-           IF user.mail_settings.${constants.REL_ANY}.${constants.EVT_FLAG_REQUESTED} %]>
-      <label for="[% prefname %]">Pošli mi e-mail když mě někdo zažádá o nastavení příznaku</label>
-      <br>
-    </td>
-  </tr>
-  <tr>
-    <td width="150"></td>
-    <td>
-      [% prefname = "email-$constants.REL_ANY-$constants.EVT_REQUESTED_FLAG" %]
-      <input type="checkbox" name="[% prefname %]" id="[% prefname %]" 
-        value="1"
-        [% " checked"
-           IF user.mail_settings.${constants.REL_ANY}.${constants.EVT_REQUESTED_FLAG} %]>
-      <label for="[% prefname %]">Pošli mi e-mail když někdo nastaví příznak, o který jsem požádal</label>
-      <br>
-    </td>
-  </tr>
+[% prefname = "email-$constants.REL_ANY-$constants.EVT_FLAG_REQUESTED" %]
+<input type="checkbox" name="[% prefname %]" id="[% prefname %]" value="1"
+       [%+ 'checked="checked"' IF user.mail_settings.${constants.REL_ANY}.${constants.EVT_FLAG_REQUESTED} %]>
+<label for="[% prefname %]">Pošli mi e-mail když mě někdo zažádá o nastavení příznaku</label>
+<br>
+[% prefname = "email-$constants.REL_ANY-$constants.EVT_REQUESTED_FLAG" %]
+<input type="checkbox" name="[% prefname %]" id="[% prefname %]" value="1"
+       [%+ 'checked="checked"' IF user.mail_settings.${constants.REL_ANY}.${constants.EVT_REQUESTED_FLAG} %]>
+<label for="[% prefname %]">Pošli mi e-mail když někdo nastaví příznak, o který jsem požádal</label>
+
 [% IF user.is_global_watcher %]
-  <tr>
-    <td width="150"></td>
-    <td>
-      Dozorujete všechny [% terms.bugs %]. Tuto roli vám může
-      odebrat 
-      <a href="mailto:[% Param("maintainer") %]">[% Param("maintainer") %]</a>.
-    </td>
-  </tr>
+  <p>
+    Sledujete všechny [% terms.bugs %]. Tuto roli vám může odebrat
+    <a href="mailto:[% Param("maintainer") %]">[% Param("maintainer") %]</a>.
+  </p>
 [% END %]
-</table>
 
 <hr>
-<b>Volby specifické pro pole/příjemce:</b>
-<br>
-<br>
+
+<h3>Volby specifické pro pole/příjemce</h3>
 
 [% events = [
     { id = constants.EVT_ADDED_REMOVED,
-      description = "Jsem přidán nebo odstraněn z této funkce" },
+      description = "Je mi přidána nebo odstraněna tato schopnost" },
     { id = constants.EVT_BUG_CREATED,
-      description = "Je vytvořen nový požadavek" },
+      description = "Je vytvořen nový $terms.bug" },
     { id = constants.EVT_OPENED_CLOSED,
-      description = "Je požadavek vyřešen nebo znovuotevřen" },
+      description = "$terms.Bug je vyřešen nebo znovuotevřen" },
+    { id = constants.EVT_COMPONENT,
+      description = "Se změní produkt nabo komponenta" },
     { id = constants.EVT_PROJ_MANAGEMENT,
-      description = "Se změní priorita, stav, závažnost nebo mezník" },
+      description = "Se změní priorita, stav, závažnost nebo milník" },
     { id = constants.EVT_COMMENT,
       description = "Je přidán nový komentář" },
     { id = constants.EVT_ATTACHMENT,
@@ -129,16 +109,16 @@ document.write('<input type="button" value="Zakázat všechny e-maily" onclick="
     { id = constants.EVT_KEYWORD,
       description = "Se změní klíčová slova" },
     { id = constants.EVT_CC,
-      description = "Se změní pole 'V kopii'" },
+      description = "Se změní pole 'V kopii(CC)'" },
     { id = constants.EVT_DEPEND_BLOCK,
       description = "Se změní strom závislostí" },
     { id = constants.EVT_OTHER,
-      description = "Jakékoliv další pole, které nebylo zmíněno nahoře" },
+      description = "Se změní jakékoliv další pole, které nebylo zmíněno" },
 ] %]
 
 [% neg_events = [
     { id = constants.EVT_UNCONFIRMED,
-      description = "Je požadavek ve stavu 'Nepotvrzený'" },
+      description = "Je $terms.bug ve stavu 'Nepotvrzený'" },
     { id = constants.EVT_CHANGED_BY_ME,
       description = "Byl požadavek změněn mnou" },
 ] %]
@@ -149,7 +129,7 @@ document.write('<input type="button" value="Zakázat všechny e-maily" onclick="
     { id = constants.REL_REPORTER,
       description = "Oznamovatel" },
     { id = constants.REL_CC,
-      description = "V Kopii" },
+      description = "V Kopii(CC)" },
 ] %]
 
 [% IF Param('useqacontact') %]
@@ -165,40 +145,34 @@ document.write('<input type="button" value="Zakázat všechny e-maily" onclick="
 
 [% num_columns = relationships.size %]
 
-<table class="bz_emailprefs" border="1">
-  <tr>
-    <td colspan="[% num_columns FILTER html %]" align="center" width="50%">
-      <b>Když je můj vztah k požadavku:</b>
-    </td>
-    <td rowspan="2" width="40%">
-      <b>Chci dostávat e-maily když:</b>
-    </td>
+<table id="email_prefs">
+  <tr class="column_header">
+    <th colspan="[% num_columns FILTER html %]">
+      Když je můj vztah k [% terms.bugu %]:
+    </th>
+    <th>Chci dostávat e-maily když:</th>
   </tr>
 
   <tr>
     [% FOREACH relationship = relationships %]
-      <th align="center" width="9%">
-        [% relationship.description FILTER html %]
-      </th>
+      <th class="role_header">[% relationship.description FILTER html %]</th>
     [% END %]
   </tr>
-  
+
   [% FOREACH event = events %]  
     [% count = loop.count() %]
     <tr class="bz_row_[% count % 2 == 1 ? "odd" : "even" %]">
       [% FOREACH relationship = relationships %]
-        <td align="center">
-          <input type="checkbox" 
-            name="email-[% relationship.id %]-[% event.id %]"
-            value="1"
-            [%# The combinations don't always make sense; disable a couple %]
-            [% IF event.id == constants.EVT_ADDED_REMOVED AND 
-                  no_added_removed.contains(relationship.id) 
-            %]
-               disabled
-            [% ELSIF user.mail_settings.${relationship.id}.${event.id} %]
-               checked
-            [% END %]>
+        <td class="center">
+          <input type="checkbox" value="1"
+                 name="email-[% relationship.id %]-[% event.id %]"
+                 [%# The combinations don't always make sense; disable a couple %]
+                 [% IF event.id == constants.EVT_ADDED_REMOVED
+                       AND no_added_removed.contains(relationship.id) %]
+                   disabled="disabled"
+                 [% ELSIF user.mail_settings.${relationship.id}.${event.id} %]
+                   checked="checked"
+                 [% END %]>
         </td>
       [% END %]
       <td>
@@ -206,64 +180,56 @@ document.write('<input type="button" value="Zakázat všechny e-maily" onclick="
       </td>
     </tr>
   [% END %]
-  
-  <tr>
-    <td colspan="[% num_columns FILTER html %]" 
-        align="center" width="50%">
-      &nbsp;
-    </td>
-    <td width="40%">
-      <b>ale ne když (přepíše nastavení viz výše):</b>
-    </td>
+
+  <tr class="column_header">
+    <th colspan="[% num_columns FILTER html %]">&nbsp;</th>
+    <th>ale ne když (přepíše nastavení viz výše):</th>
   </tr>
 
   [% FOREACH event = neg_events %]  
     [% count = loop.count() %]
     <tr class="bz_row_[% count % 2 == 1 ? "odd" : "even" %]">
       [% FOREACH relationship = relationships %]
-        <td align="center">
-          <input type="checkbox" 
-            name="neg-email-[% relationship.id %]-[% event.id %]"
-            value="1"
-            [% " checked" IF NOT user.mail_settings.${relationship.id}.${event.id} %]>
+        <td class="center">
+          <input type="checkbox" value="1"
+                 name="neg-email-[% relationship.id %]-[% event.id %]"
+                 [%+ 'checked="checked"' IF NOT user.mail_settings.${relationship.id}.${event.id} %]>
         </td>
       [% END %]
-      <td>
-        [% event.description FILTER html %]
-      </td>
+      <td>[% event.description FILTER html %]</td>
     </tr>
   [% END %]
-  
 </table>
 
 <hr>
-<b>Sledování uživatelů</b>
+
+<h3>Sledování uživatelů</h3>
 
 <p>
-Pokud sledujete uživatele, Je to jako používat jeho boty z pohledu
-odesílání emalů. Email tedy není odeslán podle <u>vašich</u>
-nastavení, ale podle <u>jeho</u> vztahu, který na [% terms.bug %] 
-(např.. Příjemce).
+Pokud sledujete uživatele, je to jako používat jeho boty z pohledu
+odesílání e-mailů. E-mail tedy není odeslán podle <u>vašich</u>
+nastavení, ale podle <u>jeho</u> vztahu k [% terms.bugu %] 
+(např. Příjemce).
 </p>
 
-<p>
 [% IF watchedusers.size %]
-Momentálně sledujete tyto uživatele:
-  </p>
+  <p>Momentálně sledujete uživatele v tomto seznamu:</p>
   <p>
     <select id="watched_by_you" name="watched_by_you" multiple="multiple" size="5">
         [% FOREACH w = watchedusers %]
            <option value="[% w FILTER html %]">[% w FILTER html %]</option>
         [% END %]
-    </select> <br />
+    </select>
+    <br>
     <input type="checkbox" id="remove_watched_users" name="remove_watched_users">
     <label for="remove_watched_users">Remove selected users from my watch list</label>
+  </p>
 [% ELSE %]
-Momentálně nesledujete zádné uživatele.
+  <p>Momentálně nesledujete zádné uživatele.</p>
 [% END %]
-</p>
 
-<p id="new_watched_by_you">Přidat uživatele do seznamu sledovaných uživatelů (seznam oddělený čárkami):
+
+<p id="new_watched_by_you">Přidat uživatele do seznamu sledovaných (seznam oddělený čárkami):
   [% INCLUDE global/userselect.html.tmpl
      id => "new_watchedusers"
      name => "new_watchedusers"
@@ -271,7 +237,7 @@ Momentálně nesledujete zádné uživatele.
      size => 60
      multiple => 5
   %]
-</p>            
+</p>
 
 <p id="watching_you">Uživatelé, kteří sledují vás:<br>
   [% IF watchers.size %]
@@ -285,4 +251,42 @@ Momentálně nesledujete zádné uživatele.
 
 <hr>
 
-<br>
+<h3>Ignorovat [% terms.bugs %]</h3>
+
+<p>
+  Můžete specifikovat seznam [% terms.bugsu %] pro které nikdy nechcete dostávat
+  jakákoliv upozornění e-mailem tak, že přidáte jejich ID jako seznam oddělený čárkami.
+  Odstranění [% terms.bugu %] označením v současném seznamu ignorovaných
+  znovu obnoví upozornění e-mailem pro tento [% terms.bug %].
+</p>
+[% IF user.bugs_ignored.size %]
+  <p>
+    Nyní ignorujete:
+    <table>
+    [% FOREACH bug = user.bugs_ignored %]
+      <tr>
+        <td>
+          <input type="checkbox" name="remove_ignored_bug_[% bug.id FILTER html %]" value="1">
+        </td>
+        <td><a href="[% urlbase FILTER html %]show_bug.cgi?id=[% bug.id FILTER uri %]">
+          [% bug.id FILTER html %]</a>
+        </td>
+        <td>[% bug.status FILTER html %]</td>
+        <td>
+          [% IF user.can_see_bug(bug.id) %]
+            - [% bug.summary FILTER html %]
+          [% ELSE %]
+            (soukromý)
+          [% END %]
+        </td>
+      </tr>
+    [% END %]
+    </table>
+  </p>
+[% END %]
+
+<p>
+  Add [% terms.bugs %]:<br>
+  <input type="text" id="add_ignored_bugs" 
+         name="add_ignored_bugs" size="60">
+</p>

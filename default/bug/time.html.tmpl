@@ -5,19 +5,16 @@
   # This Source Code Form is "Incompatible With Secondary Licenses", as
   # defined by the Mozilla Public License, v. 2.0.
   #%]
-                                      
+
 [% BLOCK formattimeunit %]
   [%# INTERFACE:
     # time_unit:  the number converting, converts to 2 decimal places
     #             unless the last character is a 0, then it truncates to 
-    #             1 decimal place
+    #             1 decimal place; czech: , instead of . ?
     #%]
   [% time_unit = time_unit FILTER format('%.2f') %]
-  [% IF time_unit.match('0\Z') %]
-    [% time_unit FILTER format('%.1f') FILTER replace(',', '.') %]
-  [% ELSE %]
-    [% time_unit FILTER format('%.2f') FILTER replace(',', '.') %]
-  [% END %]
+  [% time_unit.replace('0\Z', '') %]
+  [% time_unit.replace(',', '.') %]
 [% END %]
 
 [% BLOCK calculatepercentage %]

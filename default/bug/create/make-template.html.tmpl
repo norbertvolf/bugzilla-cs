@@ -12,8 +12,8 @@
   #%]
 
 [% PROCESS global/header.html.tmpl
-  title = "Záložky jsou vaši přátelé"
-  header = "Template constructed"
+  title = "Záložka pro záznam $terms.bugu"
+  header = "Předloha sestavena"
 %]
 
 <p>
@@ -22,10 +22,10 @@
   [% IF short_desc %]
     [% short_desc FILTER html %]
   [% ELSE %]
-    [% terms.Bug %] entry template
+    [% terms.Bug %] předloha záznamu
   [% END %]</a>&rdquo;.
-  This bookmark will bring up the <em>Enter [% terms.Bug %]</em> page with the
-  fields initialized as you've requested.
+  Tato záložka vás zavede na formulář <em>Vložte [% terms.bug %]</em>
+  s přednastavenými hodnotami dle požadavků.
 </p>
 
 [% PROCESS global/footer.html.tmpl %]

@@ -7,19 +7,19 @@
   #%]
 
 [% PROCESS global/header.html.tmpl
-  title = "Nastavit sloupce"
-  javascript_urls = "js/change-columns.js"
+  title = "Change Columns"
+  javascript_urls = [ "js/change-columns.js" ]
   onload = "initChangeColumns()"
 %]
 
 <p>
-  Vyberte sloupce, které si chcete zobrazit ve vašem seznamu
+  Vyberte sloupce, které chcete zobrazit ve vašem seznamu [% terms.bugsu %].
   Tato vlastnost vyžaduje zapnuté cookies.
 </p>
 
 [% field_descs.short_short_desc     = "Předmět (prvních 60 znaků)" %]
 [% field_descs.short_desc           = "Celý předmět" %]
-[% field_descs.assigned_to_realname = "Skutečné jméno $field_descs.assigned_to " %]
+[% field_descs.assigned_to_realname = "Skutečné jméno $field_descs.assigned_to" %]
 [% field_descs.reporter_realname    = "Skutečné jméno $field_descs.reporter" %]
 [% field_descs.qa_contact_realname  = "Skutečné jméno $field_descs.qa_contact" %]
 
@@ -41,7 +41,7 @@
       <tr>
         <th><div id="avail_header" class="bz_default_hidden">Sloupce k dispozici</div></th>
         <th></th>
-        <th colspan="2">Sloupc vybrané</th>
+        <th colspan="2">Sloupce vybrané</th>
       </tr>
       <tr>
         <td>
@@ -125,8 +125,7 @@
   </p>
 
   <input type="submit" id="resetit" name="resetit" 
-         value="Implicitni nastavení sloupců">
+         value="Implicitní nastavení sloupců">
 </form>
 
 [% PROCESS global/footer.html.tmpl %]
-

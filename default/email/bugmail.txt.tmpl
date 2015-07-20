@@ -17,11 +17,20 @@
 [% FOREACH comment = new_comments %]
 
 [%- IF comment.count %]
---- Komentář #[% comment.count %] from [% comment.author.identity %] ---
+--- Komentář #[% comment.count %] od [% comment.author.identity %] ---
 [% END %]
-[%+ comment.body_full({ is_bugmail => 1, wrap => 1 }) %]
+[%+ comment.body_full({ is_bugmail => 1, wrap => 1 }) FILTER strip_control_chars %]
 [% END %]
 
+[% IF referenced_bugs.size %]
+
+Odkazované [% terms.bugs %]:
+
+[% FOREACH ref_bug = referenced_bugs %]
+[%+ urlbase %]show_bug.cgi?id=[% ref_bug.id %]
+[%+ "[" _ terms.Bug _ " " _ ref_bug.id _ "] " _ ref_bug.short_desc FILTER wrap_comment %]
+[% END %]
+[% END %]
 -- [%# Protect the trailing space of the signature marker %]
 Tento mail jste přijali z následujích důvodů:
 [% SET reason_lines = [] %]
@@ -36,7 +45,6 @@ Tento mail jste přijali z následujích důvodů:
 
 [% BLOCK generate_diffs %]
   [% urlbase %]show_bug.cgi?id=[% bug.id %]
-
 [%+ last_changer = 0 %]
   [% FOREACH change = diffs %]
     [% IF !isnew && changer.id != last_changer %]

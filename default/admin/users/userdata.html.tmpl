@@ -21,11 +21,12 @@
   <th><label for="login">Uživatelské jméno:</label></th>
   <td>
     [% IF editusers %]
-      <input size="64" maxlength="255" name="login" 
-             id="login" value="[% otheruser.login FILTER html %]" />
+      <input size="64" maxlength="255" id="login" name="login"
+             value="[% otheruser.login FILTER html %]"
+             [%- " autofocus" UNLESS editform %] required>
       [% IF editform %]
         [% IF !otheruser.in_group('bz_sudo_protect') %]
-          <br />
+          <br>
           <a href="relogin.cgi?action=prepare-sudo&amp;target_login=
           [%- otheruser.login FILTER uri %]">Přihlásit se jako tento uživatel</a>
         [% END %]
@@ -52,9 +53,8 @@
   <th><label for="name">Skutečné jméno:</label></th>
   <td>
     [% IF editusers %]
-      <input size="64" maxlength="255" name="name"
-             autocomplete="off"
-             id="name" value="[% otheruser.name FILTER html %]" />
+      <input size="64" maxlength="255" id="name" name="name"
+             autocomplete="off" value="[% otheruser.name FILTER html %]">
     [% ELSE %]
       [% otheruser.name FILTER html %]
     [% END %]
@@ -65,32 +65,39 @@
   # if we ever have a login system that can create accounts through
   # createaccount.cgi but can't change passwords.
   #%]
-  
+  [% password_complexity = Param('password_complexity') %]
 [% IF editusers %]
   [% IF user.authorizer.can_change_password %]
   <tr>
     <th><label for="password">Heslo:</label></th>
     <td>
       <input type="password" size="16" name="password" id="password"
-             value="" autocomplete="off" />
-      [% IF editform %]<br />
+             value="" autocomplete="off" [% 'required' IF !editform %]>
+      [% IF password_complexity == "mixed_letters" %] 
+        (Heslo musí obsahovat nejméně jedno VELKÉ a jedno malé písmeno.)
+      [% ELSIF password_complexity == "letters_numbers" %] 
+        (Heslo musí obsahovat nejméně jedno VELKÉ a jedno malé písmeno a číslici.)
+      [% ELSIF password_complexity == "letters_numbers_specialchars" %] 
+        (Heslo musí obsahovat nejméně jedno písmeno, jednu číslici a zvlaštní znak.)
+      [% END %]
+      [% IF editform %]<br>
         (Vložte heslo pro změnu.)
       [% END %]
     </td>
   </tr>
   [% END %]
   <tr>
-    <th><label for="disable_mail">Neposílat e-maily:</label></th>
+    <th><label for="disable_mail">Neposílat e-maily s [% terms.bugs %]:</label></th>
     <td>
       <input type="checkbox" name="disable_mail" id="disable_mail" value="1" 
              [% IF otheruser.email_disabled %] checked="checked" [% END %] 
              onchange="disable_mail_manually_set=1;">
-      (Toto nastavení má vliv e-maily, které souvisí se změnou požadavků, ale emaily nesouvisející s požadavky  
-      (např. reset hesla) zůstanou funkční.)
+      (Toto nastavení má vliv na e-maily s požadavky a stížnostmi. E-maly ohledně změny hesla nebo jiné
+      které se netýkají změn [% terms.bugsu %] budou dále zasílány)
     </td>
   </tr>
   <tr>
-    <th><label for="disabledtext">Text pro zablokování:</label></th>
+    <th><label for="disabledtext">Text při zablokování:</label></th>
     <td>
       [% INCLUDE global/textarea.html.tmpl
          name           = 'disabledtext'
@@ -104,6 +111,15 @@
        %]<br>
       (Když je pole vyplněno a účet je zablokován je zobrazen text z pole,
       který vysvětlí důvod zablokování.)
+    </td>
+  </tr>
+[% END %]
+[% UNLESS editform %]
+  <tr>
+    <th><label for="notify_user">Notify User:</label></th>
+    <td>
+      <input type="checkbox" name="notify_user" id="notify_user" value="1">
+      (Email this user their account information. The password will not be included.)
     </td>
   </tr>
 [% END %]

@@ -11,10 +11,6 @@
   #   used by bug/activity/table.html.tmpl to display recent changes that will
   #   be overwritten if the user submits these changes.  See that template
   #   for further documentation.
-  # start_at: number; the comment at which show/comments.tmpl should begin
-  #   displaying comments, either the index of the last comment (if the user
-  #   entered a comment along with their change) or a number less than that
-  #   (if they didn't), in which case no comments are displayed.
   # comments: array; all the comments on the bug.
   # bug: Bugzilla::Bug; the bug being changed.
   #%]
@@ -40,7 +36,7 @@
   [% PROCESS "bug/activity/table.html.tmpl" incomplete_data=0 %]
 </p>
 
-[% IF comments.size > start_at %]
+[% IF comments.size %]
 <p>
   Přidané komentáře:
   <blockquote>
@@ -69,9 +65,9 @@ Nyní máte následující možnosti:
              value="[% bug.delta_ts FILTER html %]">
       [% PROCESS "global/hidden-fields.html.tmpl" 
           exclude="^Bugzilla_login|Bugzilla_password|delta_ts$" %]
-      <input type="submit" id="process" value="Submit my changes anyway">
+      <input type="submit" id="process" value="Opravdu odeslat mé změny">
         Toto způsobí, že veškeré změny budou přepsány
-        [% ", neplatí pro přidané komentáře" IF comments.size > start_at %].
+        [% ", neplatí pro přidané komentář(e)" IF comments.size %].
     </form>
   </li>
   [% IF cgi.param("comment") %]
@@ -82,9 +78,8 @@ Nyní máte následující možnosti:
         <input type="hidden" name="comment" value="[% cgi.param("comment") FILTER html %]">
         <input type="hidden" name="comment_is_private"
                value="[% cgi.param("comment_is_private") FILTER html %]">
-        <input type="hidden" name="longdesclength" value="[% bug.comments.size %]">
         <input type="hidden" name="token" value="[% cgi.param("token") FILTER html %]">
-        <input type="submit" id="process_comment" value="Submit only my new comment">
+        <input type="submit" id="process_comment" value="Odeslat pouze můj nový komentář">
       </form>
     </li>
   [% END %]

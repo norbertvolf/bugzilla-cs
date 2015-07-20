@@ -39,7 +39,7 @@
   <p>
     Popisek byl upraven na:
   </p>
-  <p style="margin: 1em 3em 1em 3em">[% product.description FILTER html_light %]</p>
+  <p class="indented">[% product.description FILTER html_light %]</p>
 [% END %]
 
 [% IF changes.isactive.defined %]
@@ -48,7 +48,7 @@
   [% IF product.is_active %]
     otevřen
   [% ELSE %]
-    uzavřen
+    uzavřen 
   [% END %]
   pro nové [% terms.bugs %].
   </p>

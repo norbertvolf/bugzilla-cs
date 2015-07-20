@@ -13,39 +13,43 @@
   #%]
 
 <table>
-  <tr>
-    <td colspan="3">
-      Pro potvrzení změn účtu zadej prosím své aktuální heslo
-    </td>
-  </tr>
-  <tr>
-    <th align="right">Heslo:</th>
-    <td>
-      <input type="hidden" name="old_login" value="[% user.login FILTER html %]">
-      <input type="password" name="old_password">
-    </td>
-  </tr>              
-  <tr>
-    <td colspan="2"><hr></td>
-  </tr>
+  [% IF user.authorizer.can_change_password
+        || (user.authorizer.can_change_email && Param('allowemailchange')) %]
+    <tr>
+      <td colspan="3">
+        Pro potvrzení změn účtu zadej prosím své aktuální heslo.
+      </td>
+    </tr>
+    <tr>
+      <th>Heslo:</th>
+      <td>
+        <input type="hidden" name="old_login" value="[% user.login FILTER html %]">
+        <input type="password" name="old_password">
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2"><hr></td>
+    </tr>
+  [% END %]
+
   [% IF user.authorizer.can_change_password %]
     <tr>
-      <th align="right">Nové heslo:</th>
+      <th>Nové heslo:</th>
       <td>
         <input type="password" name="new_password1">
       </td>
-    </tr>              
+    </tr>
 
     <tr>
-      <th align="right">Potvrzení nového hesla:</th>
+      <th>Potvrzení nového hesla:</th>
       <td>
         <input type="password" name="new_password2">
       </td>
-    </tr>              
+    </tr>
   [% END %]
 
   <tr>
-    <th align="right">Vaše pravé jméno (nepovinné ale doporučené):</th>
+    <th>Your real name (optional, but encouraged):</th>
     <td>
       <input size="35" name="realname" value="[% realname FILTER html %]">
     </td>
@@ -55,28 +59,35 @@
     [% IF login_change_date %]
       [% IF new_login_name %]
         <tr>
-          <th align="right">Čekající e-mailová adresa:</th>
+          <th>Čekající e-mailová adresa:</th>
           <td>[% new_login_name FILTER html %]</td>
         </tr>
         <tr>
-          <th align="right">Požadavek na změnu vyprší:</th>
+          <th>Požadavek na změnu vyprší:</th>
           <td>[% login_change_date FILTER time %]</td>
         </tr>
       [% ELSE %]
         <tr>
-          <th align="right">Potvrzená e-mailová adresa:</th>
+          <th>Potvrzená e-mailová adresa:</th>
           <td>[% user.login FILTER html %]</td>
         </tr>
         <tr>
-          <th align="right">Datum dokončení:</th>
+          <th>Datum dokončení:</th>
           <td>[% login_change_date FILTER time %]</td>
         </tr>
       [% END %]
     [% ELSE %]
       <tr>
-        <th align="right">Nová e-mailová adresa:</th>
+        <th>
+          [% IF Param('emailsuffix') %]
+            Nové přihlašovací jméno:
+          [% ELSE %]
+            Nová e-mailová adresa:
+          [% END %]
+        </th>
         <td>
-          <input size="35" name="new_login_name">
+          <input size="35" id="new_login_name" name="new_login_name"
+                 [%- ' type="email"' UNLESS Param('emailsuffix') %]>
         </td>
       </tr>
     [% END %]

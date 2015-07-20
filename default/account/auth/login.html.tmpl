@@ -15,8 +15,7 @@
 [% END %]
 
 [% PROCESS global/header.html.tmpl
-  title = "Přihlášení do $terms.Bugzilla",
-  onload = "document.forms['login'].Bugzilla_login.focus()"
+  title = "Přihlášení do $terms.Bugzilla"
 %]
 
 [% USE Bugzilla %]
@@ -25,20 +24,29 @@
   Pro pokračování je zapotřebí vložit platné jméno a heslo.
 </p>
 
-<form name="login" action="[% target FILTER html %]" method="POST"
+<form name="login" action="[% urlbase FILTER html %][% target FILTER html %]" method="POST"
 [%- IF Bugzilla.cgi.param("data") %] enctype="multipart/form-data"[% END %]>
   <table>
     <tr>
-      <th align="right"><label for="Bugzilla_login">Jméno:</label></th>
+      <th>
+        <label for="Bugzilla_login">
+          [% IF Param('emailsuffix') %]
+            Jméno:
+          [% ELSE %]
+            Váš e-mail:
+          [% END %]
+        </label>
+      </th>
       <td>
-        <input size="35" id="Bugzilla_login" name="Bugzilla_login">
+        <input size="35" id="Bugzilla_login" name="Bugzilla_login"
+               [%- ' type="email"' UNLESS Param('emailsuffix') %] autofocus required>
         [% Param('emailsuffix') FILTER html %]
       </td>
     </tr>
     <tr>
-      <th align="right"><label for="Bugzilla_password">Heslo:</label></th>
+      <th><label for="Bugzilla_password">Heslo:</label></th>
       <td>
-        <input type="password" size="35" id="Bugzilla_password" name="Bugzilla_password">
+        <input type="password" size="35" id="Bugzilla_password" name="Bugzilla_password" required>
       </td>
     </tr>
 
@@ -68,8 +76,10 @@
   [% PROCESS "global/hidden-fields.html.tmpl"
      exclude="^Bugzilla_(login|password|restrictlogin)$" %]
 
+  <input type="hidden" name="Bugzilla_login_token"
+         value="[% get_login_request_token() FILTER html %]">
   <input type="submit" name="GoAheadAndLogIn" value="Přihlásit" id="log_in">
-  
+
   <p>
     (Pozn: prosím ujistěte se, že máte pro tento web server povoleny cookies.
     V opačném případě budete často nuceni se znova přihlašovat.)
@@ -92,7 +102,7 @@
         Uživatelský účet je povinný. Tato  instalace aplikace [% terms.Bugzilla %]
         je přístupná jen autentifikovaným uživatelů.
       [% ELSIF target.match("_bug\.cgi$") %]
-        Uživatelský účet je povinný pro zadání nového [% terms.bug %] nebo pro 
+        Uživatelský účet je povinný pro zadání nového [% terms.bug %] nebo pro
         komentování existujících. Pak můžete být v případě potřeby informován
         o změnách.
       [% END %]
@@ -107,7 +117,7 @@
       Pokud máte účet, ale zapomněli jste heslo,
       vložte Vaše přihlašovací jméno (e-mail) do políčka níže
       a odešlete žádost o změnu hesla.<br>
-      <input size="35" name="loginname">
+      <input size="35" name="loginname" required>
       <input type="hidden" id="token" name="token" value="[% issue_hash_token(['reqpw']) FILTER html %]">
       <input type="submit" id="request" value="Změna hesla">
     </form>

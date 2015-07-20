@@ -16,8 +16,8 @@
 [% END %]
 
 [% PROCESS global/header.html.tmpl 
-  style_urls = [ "skins/standard/reports.css" ]
-  title = title 
+  style_urls = ['skins/standard/buglist.css']
+  title = title
 %]
 
 [% IF Param("useqacontact") %]
@@ -26,39 +26,23 @@
   [% numcols = 2 %]
 [% END %]
 
-<table cellpadding="0" cellspacing="0" id="components_header_table">
-  <tr>
-    <td class="instructions">
-	Zvolte si komponentu, pro kterou chcete vidět otevřené [% terms.bugs %]:
-    </td>
-    <td class="product_container">
-      <span class="product_name">[% product.name FILTER html %]</span>
-      <div class="product_desc">
-        [% product.description FILTER html_light %]
-      </div>
-    </td>
-  </tr>
-</table>
+<h1>[% product.name FILTER html %]</h1>
 
-<span class="components_header">Komponenty</span>
+<div id="product_desc">[% product.description FILTER html_light %]</div>
+<p>Zvolte si komponentu, pro kterou chcete vidět otevřené [% terms.bugs %].</p>
 
-<table summary="Components table"
-       class="component_table" cellspacing="0" cellpadding="0">
-  <thead>
+<table id="component_table">
   <tr>
-    <th>&nbsp;</th>
+    <th>Komponenta</th>
     <th>Výchozí příjemce</th>
     [% IF Param("useqacontact") %]
-      <th>Výchozí kontakt QA</th>
+      <th>Výchozí QA kontakt</th>
     [% END %]
   </tr>
-  </thead>
 
-  <tbody>
   [% FOREACH comp = product.components %]
     [% INCLUDE describe_comp %]
   [% END %]
-  </tbody>
 </table>
 
 [% PROCESS global/footer.html.tmpl %]

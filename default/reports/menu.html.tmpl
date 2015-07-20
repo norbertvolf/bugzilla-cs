@@ -12,14 +12,14 @@
   #%]
 
 [% PROCESS global/header.html.tmpl
-  title = "Sestavy a grafy"
-  doc_section = "reporting.html"
-  style_urls = ['skins/standard/reports.css']
+  title = "Kuchyně sestav a grafů"
+  doc_section = "using/reports-and-charts.html"
+  style_urls = ['skins/standard/buglist.css']
 %]
 
 <p>
-  [% terms.Bugzilla %] vám umožňuje sledovat a prohlížet [% terms.bugs %] a
-  stav databáze mnoha vzrušujícími způsoby.
+  [% terms.Bugzilla %] vám umožňuje sledovat a prohlížet [% terms.bugs %] a stav databáze
+  mnoha vzrušujícími způsoby.
 </p>
 
 <h2>Aktuální stav</h2>
@@ -27,7 +27,7 @@
 <ul>
   <li id="report_search">
     <strong><a href="query.cgi">Hledání</a></strong> -
-    [% terms.bugs %] v seznamu
+    vypiš množiny [% terms.bugsu %].
   </li>
   <li id="report_tabular">
     <strong>
@@ -45,7 +45,7 @@
   [% END %]
   <li id="report_duplicates">
     <strong><a href="duplicates.cgi">Duplikáty</a></strong> -
-    vypíše [% terms.bugs %]i, které jsou často nahlášeny.
+    vypíše [% terms.bugs %], které jsou často nahlášeny.
   </li>
   [% Hook.process('current_state') %]
 </ul>
@@ -57,14 +57,14 @@
     [% IF feature_enabled('old_charts') %]
       <li id="old_charts">
         <strong><a href="reports.cgi">Stará verze grafů</a></strong> - 
-        vykreslí stav nebo řešení [% terms.bugsu %] v čase 
-        pro jednotlivé produkty v databázi.
+        vykreslí stav nebo řešení [% terms.bugsu %] v
+        čase pro jednotlivé produkty v databázi.
       </li>
     [% END %]
     [% IF feature_enabled('new_charts') AND user.in_group(Param("chartgroup")) %]
       <li id="new_charts">
         <strong><a href="chart.cgi">Nová verze grafů</a></strong> - 
-        vykreslí výsledky jakéhokoliv vyhledávání v čase. Je opravdu lepší.
+        vykreslí výsledky jakéhokoliv vyhledávání v čase. Je opravdu mnohem lepší.
       </li>
     [% END %]
   </ul>

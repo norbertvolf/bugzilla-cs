@@ -17,9 +17,8 @@
 
 [% PROCESS global/header.html.tmpl
   title = "Hledání uživatelů"
-  style_urls = ['skins/standard/editusers.css']
-  onload = "document.forms['f'].matchstr.focus()"
-  doc_section = "useradmin.html#user-account-search"
+  style_urls = ['skins/standard/admin.css']
+  doc_section = "administering/users.html"
 %]
 
 [% PROCESS admin/users/listselectvars.html.tmpl
@@ -27,7 +26,7 @@
 %]
 
 <form name="f" method="get" action="editusers.cgi">
-<input type="hidden" name="action" value="list" />
+<input type="hidden" name="action" value="list">
 <p><label for="matchvalue">Seznam uživatelů jejichž</label>
 <select id="matchvalue" name="matchvalue">
   <option value="login_name">uživatelské jméno</option>
@@ -35,17 +34,18 @@
   <option value="userid">identifikátor</option>
 </select>
 <label for="matchstr">odpovídá</label>
-<input size="32" name="matchstr" id="matchstr" />
+<input size="32" name="matchstr" id="matchstr" autofocus>
 <select name="matchtype">
-  <option value="substr" selected="selected">řetězci bez ohledu na velikost písmen</option>
-  <option value="regexp">reg. výrazu s ohledem na velikost písmen</option>
-  <option value="notregexp">negace (reg. výraz bez ohledu na velikost písmen)</option>
+  <option value="substr" selected="selected">podřetězci bez ohledu na velikost písmen</option>
+  <option value="regexp">regulár. výrazu bez ohledu na velikost písmen</option>
+  <option value="notregexp">negaci(regulár. výrazu bez ohledu na velikost písmen)</option>
   <option value="exact">přesnému výrazu (hledání konkrétního uživatele)</option>
 </select>
-<input type="submit" id="search" value="Hledat" /></p>
+<input type="submit" id="search" value="Hledat">
+</p>
 
 [% IF restrictablegroups.size %]
-  <p><input type="checkbox" name="grouprestrict" value="1" id="grouprestrict" />
+  <p><input type="checkbox" name="grouprestrict" value="1" id="grouprestrict">
   <label for="grouprestrict">Omezit na uživatele skupiny</label>
   <select name="groupid"
           onchange="document.forms['f'].grouprestrict.checked=true">
@@ -56,9 +56,13 @@
 [% END %]
 
 <p>
-  <input type="checkbox" name="enabled_only" value="1" id="enabled_only"
-         checked="checked">
-  <label for="enabled_only">Jen povolení uživatelé</label>
+  Omezit hledání na
+  <select name="is_enabled">
+      <option value="2">Všichni</option>
+      <option value="1" selected>Povolení</option>
+      <option value="0">Zakázaní</option>
+  </select>
+  users.
 </p>
 
 [% Hook.process('end') %]
@@ -67,7 +71,7 @@
 
 [% IF editusers %]
   <p>
-    You can also <a href="editusers.cgi?action=add">přidat nového uživatele</a>
+    Můžete také <a href="editusers.cgi?action=add">přidat nového uživatele</a>
     [%- IF listselectionvalues %],
       nebo
       <a href="editusers.cgi?action=list[% INCLUDE listselectionurlparams %]">znovu

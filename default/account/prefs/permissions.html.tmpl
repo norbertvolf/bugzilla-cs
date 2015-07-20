@@ -17,12 +17,11 @@
   #           other people.
   #%]
 
-<table align="center">
-  <tr>
-    <td>
+    <div id="permissions">
       [% IF has_bits.size %]
-        Váš účet má nastavena tato práva:
-        <table align="center">
+        <p>Váš účet má nastavena tato práva:</p>
+
+        <table>
           [% FOREACH bit_description = has_bits %]
             <tr>
               <td>[% bit_description.name FILTER html %]</td>
@@ -34,46 +33,47 @@
         [% FOREACH privs = ["editcomponents", "canconfirm", "editbugs"] %]
           [% SET products = ${"local_$privs"} %]
           [% IF products && products.size %]
-            <br>
             <p>
               Také máte lokální '[% privs FILTER html %]' práva
               pro následující produkty:
             </p>
-            <p>
+            <ul>
               [% FOREACH product = products %]
-                [% product.name FILTER html %]<br>
+                <li>[% product.name FILTER html %]</li>
               [% END %]
-            </p>
+            </ul>
           [% END %]
         [% END %]
 
       [% ELSE %]
-        Váš účet nemá nastavena žádná oprávnění.
+        <p>Váš účet nemá nastavena žádná oprávnění.</p>
       [% END %]
 
       [% IF user.in_group('editusers') %]
-        <br>
-        Máte nastaveno právo 'editusers'. Můžete tedy nastavovat 
-        práva ostatním uživatelům.
+        <p>
+          Máte nastaveno právo 'editusers'. Můžete tedy nastavovat všechna
+          oprávnění všem ostatním uživatelům.
+        </p>
       [% ELSIF set_bits.size %]
-        <br>
-        A můžete nastavovat následující práva pro
-        <a href="editusers.cgi">ostatní uživatele</a>:
-          <table align="center">
+        <p>
+          A můžete nastavovat následující práva pro
+          <a href="editusers.cgi">ostatní uživatele</a>:
+        </p>
+
+        <table>
           [% FOREACH bit_description = set_bits %]
             <tr>
               <td>[% bit_description.name FILTER html %]</td>
               <td>[% bit_description.desc FILTER html_light %]</td>
             </tr>
           [% END %]
-          </table>
+        </table>
       [% END %]
 
       [% IF user.in_group('bz_sudoers') %]
-        <br>
-        Jste členem skupiny <b>bz_sudoers</b> group, takže se můžete
-        <a href="relogin.cgi?action=prepare-sudo">vydávat za někoho jiného</a>.
+        <p>
+          Jste členem skupiny <b>bz_sudoers</b>, takže se můžete
+          <a href="relogin.cgi?action=prepare-sudo">vydávat za někoho jiného</a>.
+        </p>
       [% END %]
-    </td>
-  </tr>
-</table>
+    </div>

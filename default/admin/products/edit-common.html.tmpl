@@ -14,35 +14,35 @@
 
 [% IF Param('useclassification') %]
   <tr>
-    <th align="right">Klasifikace:</th>
+    <th>Klasifikace:</th>
     <td><b>[% classification.name FILTER html %]</b></td>
   </tr>
 [% END %]
     
 <tr>
-  <th align="right">Produkt:</th>
+  <th>Produkt:</th>
   <td><input size="64" maxlength="64" name="product" 
-             value="[% product.name FILTER html %]">
+             value="[% product.name FILTER html %]" required>
   </td>
 </tr>
 <tr>
-  <th align="right">Popis:</th>
-  <td><textarea rows="4" cols="64" wrap="virtual" name="description">
+  <th>Popis:</th>
+  <td><textarea rows="4" cols="64" wrap="virtual" name="description" required>
         [% product.description FILTER html %]</textarea>
   </td>
 </tr>
 
 <tr>
-  <th align="right">[% terms.Bugs %] mohou být vkládány:</th>
+  <th>[% terms.Bugs %] mohou být vkládány:</th>
   <td><input type="checkbox" name="is_active" value="1"
        [% ' checked="checked"' IF product.is_active %]>
   </td>
 </tr>
 <tr>
-  <th align="right">
+  <th>
     <label for="allows_unconfirmed">Povolit
       stav [%+ display_value('bug_status', 'UNCONFIRMED') FILTER html %]
-      in v produktu:</label>
+      v produktu:</label>
   </th>
   <td><input type="checkbox" id="allows_unconfirmed" name="allows_unconfirmed"
              [% ' checked="checked"' IF product.allows_unconfirmed %]>
@@ -51,7 +51,7 @@
 
 [% IF Param('usetargetmilestone') -%]
   <tr>
-    <th align="right">Implicitní milník:</th>
+    <th>Implicitní milník:</th>
     <td>
       [% IF product.milestones.size %]
         <select name="defaultmilestone">

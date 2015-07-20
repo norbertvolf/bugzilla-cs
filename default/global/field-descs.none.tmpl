@@ -34,11 +34,14 @@
   "changedto"      => "změněno na",
   "changedby"      => "změněno kým",
   "matches"        => "odpovídá",
-  "notmatches"      => "neodpovídá",
+  "notmatches"     => "neodpovídá",
+  "isempty"        => "je prázdný",
+  "isnotempty"     => "není prázdný",
 } %]
 
 [% field_types = { ${constants.FIELD_TYPE_UNKNOWN}       => "Neznámý typ",
                    ${constants.FIELD_TYPE_FREETEXT}      => "Volný text",
+                   ${constants.FIELD_TYPE_INTEGER}       => "Celé číslo",
                    ${constants.FIELD_TYPE_SINGLE_SELECT} => "Rozbalovací menu",
                    ${constants.FIELD_TYPE_MULTI_SELECT}  => "Vícenásobný výběr",
                    ${constants.FIELD_TYPE_TEXTAREA}      => "Rozměrné textové pole",
@@ -92,6 +95,7 @@
      "everconfirmed"           => "Potvrzeno",
      "flagtypes.name"          => "Příznaky",
      "keywords"                => "Klíčová slova",
+     "last_visit_ts"           => "Poslední návštěva",
      "longdesc"                => "Komentář",
      "longdescs.count"         => "Počet komentářů",
      "longdescs.isprivate"     => "Komentář je důvěrný",
@@ -117,11 +121,11 @@
      "setting"                 => "Nastavení",
      "settings"                => "Nastavení",
      "short_desc"              => "Předmět",
+     "short_short_desc"        => "Předmět",
      "status_whiteboard"       => "Tabule",
-     "tag.name"                => "Značky",
+     "tag"                     => "Osobní značky",
      "target_milestone"        => "Milník",
      "version"                 => "Verze",
-     "votes"                   => "Hlasy",
      "work_time"               => "Odpracováno hodin",
   } %]
 

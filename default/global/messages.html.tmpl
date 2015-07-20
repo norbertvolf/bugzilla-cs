@@ -14,104 +14,96 @@
 
 [% message = BLOCK %]
   [% IF    message_tag == "account_created" %]
-    The user account [% otheruser.login FILTER html %] has been created
-    successfully.
+    Uživatelský účet [% otheruser.login FILTER html %] byl úspěšně
+    vytvořen.
     [% IF groups.size %]
-      You may want to edit the group settings now, using the form below.
+      Nyní můžete změnit nastavení skupiny pomocí formuláře níže.
     [% END %]
 
   [% ELSIF message_tag == "account_creation_canceled" %]
-    [% title = "User Account Creation Canceled" %]
-    The creation of the user account [% account FILTER html %] has been
-    canceled.
+    [% title = "Vytvoření účtu zrušeno" %]
+    Vytvoření uživatelského účtu [% account FILTER html %] bylo
+    zrušeno.
 
   [% ELSIF message_tag == "account_updated" %]
-    [% IF changed_fields.size
-          + groups_added_to.size + groups_removed_from.size
-          + groups_granted_rights_to_bless.size + groups_denied_rights_to_bless.size %]
+    [% IF changes.size %]
       [% title = "User $loginold updated" %]
-      The following changes have been made to the user account
+      Pro uživatelský účet byly provedeny následující změny
       [%+ loginold FILTER html %]:
       <ul>
-        [% FOREACH field = changed_fields %]
+        [% FOREACH field = changes.keys %]
           <li>
             [% IF    field == 'login_name' %]
-              The login is now [% otheruser.login FILTER html %].
+              Přihlášení je nyní [% otheruser.login FILTER html %].
             [% ELSIF field == 'realname' %]
-              The real name has been updated.
+              Skutečné jméno bylo aktualizováno.
             [% ELSIF field == 'cryptpassword' %]
-              A new password has been set.
+              Bylo nastaveno nové heslo.
             [% ELSIF field == 'disabledtext' %]
-              The disable text has been modified.
+              Byl upraven text k "účet zakázán".
             [% ELSIF field == 'is_enabled' %]
-              The user has been [% otheruser.is_enabled ? 'enabled' : 'disabled' %].
+              Uživatel byl [% otheruser.is_enabled ? 'enabled' : 'disabled' %].
             [% ELSIF field == 'extern_id' %]
 	      Externí přihlašovací údaje uživatele byly upraveny.
             [% ELSIF field == 'disable_mail' %]
               [% IF otheruser.email_disabled %]
-                [% terms.Bug %]mail has been disabled.
+                [% terms.Bug %] mail byl zakázán.
               [% ELSE %]
-                [% terms.Bug %]mail has been enabled.
+                [% terms.Bug %] mail byl povolen.
+              [% END %]
+            [% ELSIF field == 'groups' %]
+              [% IF changes.groups.1.size %]
+                Účet byl přidán k
+                [%+ changes.groups.1.join(', ') FILTER html %]
+                skupin[% 'ám' IF changes.groups.1.size > 1 %][% 'ě' IF changes.groups.1.size < 2 %].
+              [% END %]
+              [% IF changes.groups.0.size %]
+                Účet byl odstraněn z
+                [%+ changes.groups.0.join(', ') FILTER html %]
+                skupin[% 'y' IF changes.groups.0.size == 1 %].
+              [% END %]
+            [% ELSIF field == 'bless_groups' %]
+              [% IF changes.bless_groups.1.size %]
+                Uživatelskému účtu byla přidána práva upravit
+                [%+ changes.bless_groups.1.join(', ') FILTER html %]
+                skupin[% IF changes.bless_groups.1.size == 1 %]u[% ELSIF changes.bless_groups.1.size < 5 %]y[% END %].
+              [% END %]
+              [% IF changes.bless_groups.0.size %]
+                Uživatelskému účtu byla odebrána práva upravit
+                [%+ changes.bless_groups.0.join(', ') FILTER html %]
+                skupin[% IF changes.bless_groups.1.size == 1 %]u[% ELSIF changes.bless_groups.1.size < 5 %]y[% END %].
               [% END %]
             [% END %]
           </li>
         [% END %]
-        [% IF groups_added_to.size %]
-          <li>
-            The account has been added to the
-            [%+ groups_added_to.join(', ') FILTER html %]
-            group[% 's' IF groups_added_to.size > 1 %].
-          </li>
-        [% END %]
-        [% IF groups_removed_from.size %]
-          <li>
-            The account has been removed from the
-            [%+ groups_removed_from.join(', ') FILTER html %]
-            group[% 's' IF groups_removed_from.size > 1 %].
-          </li>
-        [% END %]
-        [% IF groups_granted_rights_to_bless.size %]
-          <li>
-            The account has been granted rights to bless the
-            [%+ groups_granted_rights_to_bless.join(', ') FILTER html %]
-            group[% 's' IF groups_granted_rights_to_bless.size > 1 %].
-          </li>
-        [% END %]
-        [% IF groups_denied_rights_to_bless.size %]
-          <li>
-            The account has been denied rights to bless the
-            [%+ groups_denied_rights_to_bless.join(', ') FILTER html %]
-            group[% 's' IF groups_denied_rights_to_bless.size > 1 %].
-          </li>
-        [% END %]
       </ul>
     [% ELSE %]
-      [% title = "User $otheruser.login not changed" %]
-      You didn't request any changes to the user's account
+      [% title = "Uživatel $otheruser.login nebyl změněn" %]
+      Nepožadovali jste žádné změny uživatelského účtu
       [%+ otheruser.login FILTER html %].
     [% END %]
 
   [% ELSIF message_tag == "account_deleted" %]
-    [% title = "User $otheruser.login deleted" %]
-    The user account [% otheruser.login FILTER html %] has been deleted
-    successfully.
+    [% title = "Uživatel $otheruser.login smazán" %]
+    Uživatelský účet [% otheruser.login FILTER html %] byl úspěšně
+    smazán.
 
   [% ELSIF message_tag == "account_disabled" %]
-    The user account [% account FILTER html %] is disabled, so you
-    cannot change its password.
+    Uživatelský účet [% account FILTER html %] je zakázán, proto
+    nemůžete změnit heslo.
 
   [% ELSIF message_tag == "attachment_creation_failed" %]
-    The [% terms.bug %] was created successfully, but attachment creation
-    failed.
-    Please add your attachment by clicking the "Add an Attachment" link
-    below.
+    [% terms.Bug %] byl úspěšně založen, ale připojení přílohy
+    selhalo.
+    Připojte prosím přílohu kliknutím na odkaz "Připojit přílohu"
+    níže.
 
   [% ELSIF message_tag == "bug_group_description" %]
-    Access to [% terms.bugs %] in the [% product.name FILTER html %] product
+    Přístup k [% terms.bugs %] v produktu [% product.name FILTER html %]
 
   [% ELSIF message_tag == "buglist_adding_field" %]
-    [% title = "Adding field to search page..." %]
-    [% link  = "Click here if the page does not redisplay automatically." %]
+    [% title = "Přidání pole do vyhledávací stránky..." %]
+    [% link  = "Klikněte zde, pokud nedošlo k znovu zobrazení automaticky." %]
 
   [% ELSIF message_tag == "buglist_updated_named_query" %]
     [% title = "Hledání bylo upraveno" %]
@@ -135,79 +127,79 @@
     Hledání <b>[% namedcmd FILTER html %]</b> bylo zapomenuto.
 
   [% ELSIF message_tag == "buglist_sorted_by_relevance" %]
-    [% terms.Bugs %] on this list are sorted by relevance, with the most
-    relevant [% terms.bugs %] at the top.
+    [% terms.Bugs %] v tomto seznamu jsou tříděny podle relevance, nejvíce
+    relevantní [% terms.bugs %] nahoře.
 
   [% ELSIF message_tag == "change_columns" %]
-    [% title = "Change columns" %]
-    Resubmitting your search with new columns...
-    Click <a href="[% redirect_url FILTER html %]">here</a>
-    if the page does not automatically refresh.
+    [% title = "Změna sloupců" %]
+    Znovuodeslání vašeho hledání s novými sloupci...
+    Kliněte <a href="[% redirect_url FILTER html %]">zde</a>
+    pokud se stránka automaticky neobnoví.
 
   [% ELSIF message_tag == "classification_created" %]
-    [% title = "New Classification Created" %]
-    The <em>[% classification.name FILTER html %]</em> classification has been created.
+    [% title = "Vytvořena nová klasifikace" %]
+    Klasifikace <em>[% classification.name FILTER html %]</em> byla vytvořena.
 
   [% ELSIF message_tag == "classification_deleted" %]
-    [% title = "Classification Deleted" %]
-    The <em>[% classification.name FILTER html %]</em> classification has been deleted.
+    [% title = "Klasifikace smazána" %]
+    Klasifikace <em>[% classification.name FILTER html %]</em> byla smazána.
 
   [% ELSIF message_tag == "classification_updated" %]
-    [% title = "Classification Updated" %]
+    [% title = "Klasifikace aktualizována" %]
     [% IF changes.keys.size %]
-      Changes to the <em>[% classification.name FILTER html %]</em> classification
-      have been saved:
+      Změny klasifikace <em>[% classification.name FILTER html %]</em>
+      byly uloženy:
       <ul>
         [% IF changes.name.defined %]
-          <li>Name updated to '[% classification.name FILTER html %]'</li>
+          <li>Jméno aktualizováno na '[% classification.name FILTER html %]'</li>
         [% END %]
         [% IF changes.description.defined %]
           [% IF classification.description %]
-            <li>Description updated to '[% classification.description FILTER html %]'</li>
+            <li>Popis aktualizován na '[% classification.description FILTER html %]'</li>
           [% ELSE %]
-            <li>Description removed</li>
+            <li>Popis odstraněn</li>
           [% END %]
         [% END %]
         [% IF changes.sortkey.defined %]
-          <li>Sortkey updated to '[% classification.sortkey FILTER html %]'</li>
+          <li>Klíč řazení aktualizován na '[% classification.sortkey FILTER html %]'</li>
         [% END %]
         [% Hook.process('classification_updated_fields') %]
       </ul>
     [% ELSE %]
-      No changes made to <em>[% classification.name FILTER html %]</em>.
+      Žádné zmeny pro <em>[% classification.name FILTER html %]</em> nebyly provedeny.
     [% END %]
 
   [% ELSIF message_tag == "component_created" %]
-    [% title = "Component Created" %]
-    The component <em>[% comp.name FILTER html %]</em> has been created.
+    [% title = "Komponenta vytvořena" %]
+    Komponenta <em>[% comp.name FILTER html %]</em> byla vytvořena.
 
   [% ELSIF message_tag == "component_deleted" %]
-    [% title = "Component Deleted" %]
-    The component <em>[% comp.name FILTER html %]</em> has been deleted.
+    [% title = "Komponenta smazána" %]
+    Komponenta <em>[% comp.name FILTER html %]</em> byla smazána.
     [% IF comp.bug_count %]
-      All [% terms.bugs %] being in this component and all references
-      to them have also been deleted.
+      Všechny [% terms.bugs %] v této komponentě a také všechny zmínky
+      o nich byly smazány.
     [% END %]
 
   [% ELSIF message_tag == "component_updated" %]
-    [% title = "Component Updated" %]
+    [% title = "Komponenta změněna" %]
     [% IF changes.keys.size %]
-      Changes to the component <em>[% comp.name FILTER html %]</em> have been saved:
+      Následující změny komponenty <em>[% comp.name FILTER html %]</em> byly uloženy:
       <ul>
       [% IF changes.name.defined %]
-        <li>Name updated to '[% comp.name FILTER html %]'</li>
+        <li>Jméno aktualizováno na '[% comp.name FILTER html %]'</li>
       [% END %]
       [% IF changes.description.defined %]
-        <li>Description updated to '[% comp.description FILTER html_light %]'</li>
+        <li>Popis aktualizován na '[% comp.description FILTER html_light %]'</li>
       [% END %]
       [% IF changes.initialowner.defined %]
-        <li>Default assignee updated to '[% comp.default_assignee.login FILTER html %]'</li>
+        <li>Výchozí příjemce aktualizován na '[% comp.default_assignee.login FILTER html %]'</li>
       [% END %]
       [% IF changes.initialqacontact.defined %]
         [% IF comp.default_qa_contact.id %]
-          <li>Default QA contact updated to '[% comp.default_qa_contact.login FILTER html %]'</li>
+          <li>Výchozí QA kontakt aktualizován na '[% comp.default_qa_contact.login FILTER html %]'</li>
         [% ELSE %]
-          <li>Default QA contact deleted</li>
+          <li>Výchozí QA kontakt smazán</li>
         [% END %]
       [% END %]
       [% IF changes.cc_list.defined %]
@@ -216,9 +208,9 @@
           [% FOREACH cc_user = comp.initial_cc %]
             [% cc_list.push(cc_user.login) %]
           [% END %]
-          <li>Default CC list updated to [% cc_list.join(", ") FILTER html %]</li>
+          <li>Výchozí seznam kopií(CC) aktualizován na [% cc_list.join(", ") FILTER html %]</li>
         [% ELSE %]
-          <li>Default CC list deleted</li>
+          <li>Výchozí seznam kopií(CC) smazán</li>
         [% END %]
       [% END %]
       [% IF changes.isactive.defined %]
@@ -271,9 +263,8 @@
     Your old account settings have been reinstated.
 
   [% ELSIF message_tag == "extension_created" %]
-    An extension named [% name FILTER html %] has been created
-    in [% path FILTER html %]. Make sure you change "YOUR NAME" and 
-    "YOUR EMAIL ADDRESS" in the code to your name and your email address.
+    Bylo vytvořeno rozšíření jménem [% name FILTER html %]
+    v [% path FILTER html %].
 
   [% ELSIF message_tag == "field_value_created" %]
     [% title = "New Field Value Created" %]
@@ -470,8 +461,8 @@
     [% url = "index.cgi?GoAheadAndLogIn=1" %]
     [% link = "Log in again." %]
     <b>Byl jste úspěšně odhlášen</b>.
-    Cookie s vaším příhlášením je smazáni. Budete vyzvání
-    k&nbsp;přihlášení jakmile to bude nutné.
+    Cookie s vaším příhlášením je smazána. Budete vyzváni
+    k přihlášení jakmile to příště bude vyžadováno.
 
   [% ELSIF message_tag == "login_changed" %]
     [% title = "$terms.Bugzilla Login Changed" %]
@@ -572,7 +563,8 @@
 
   [% ELSIF message_tag == "password_change_request" %]
     [% title = "Request to Change Password" %]
-    A token for changing your password has been emailed to you.
+    A token for changing your password has been emailed to
+    <em>[% login_name FILTER html %]</em>.
     Follow the instructions in that email to change your password.
 
   [% ELSIF message_tag == "password_changed" %]
@@ -736,7 +728,7 @@
     Renaming the '[% old FILTER html %]' table to '[% new FILTER html %]'...
 
   [% ELSIF message_tag == "install_urlbase_default" %]
-    Now that you have installed [% terms.Bugzilla %], you should visit the
+    Now that you have installed Bugzilla, you should visit the
     'Parameters' page (linked in the footer of the Administrator
     account) to ensure it is set up as you wish - this includes
     setting the 'urlbase' option to the correct URL.
@@ -755,7 +747,7 @@
     other files (including the localconfig file which stores your database
     password) must be world readable. This means that _anyone_ who can obtain
     local access to this machine can do whatever they want to your 
-    [%+ terms.Bugzilla %] installation, and is probably also able to run 
+    Bugzilla installation, and is probably also able to run
     arbitrary Perl code as the user that the web server runs as.
 
     You really, really, really need to change this setting.
@@ -765,7 +757,7 @@
     Warning: you have entered a value for the "webservergroup" parameter in
     localconfig, but you are not either a) running this script as [% constants.ROOT_USER FILTER html %]; 
     or b) a member of this group. This can cause permissions problems and 
-    decreased security.  If you experience problems running [% terms.Bugzilla %]
+    decreased security.  If you experience problems running Bugzilla
     scripts, log in as [% constants.ROOT_USER FILTER html %] and re-run this script, become a 
     member of the group, or remove the value of the "webservergroup" parameter.
 
@@ -773,7 +765,7 @@
     Warning: You have set webservergroup in [% constants.bz_locations.localconfig FILTER html %]
     Please understand that this does not bring you any security when
     running under Windows.
-    Verify that the file permissions in your [% terms.Bugzilla %] directory are
+    Verify that the file permissions in your Bugzilla directory are
     suitable for your system. Avoid unnecessary write access.
 
   [% ELSIF message_tag == "install_workflow_init" %]
@@ -798,6 +790,30 @@
     or you don't have access to it. The following is a list of the
     products you can choose from.
 
+  [% ELSIF message_tag == "quips_added" %]
+    Your quip <em>[% added_quip FILTER html %]</em> has been added.
+    [% IF Param("quip_list_entry_control") == "moderated" AND
+          !user.in_group('bz_quip_moderators') %]
+      It will be used as soon as it gets approved.
+    [% END %]
+
+  [% ELSIF message_tag == "quips_deleted" %]
+    The quip <em>[% deleted_quip FILTER html %]</em> has been deleted.
+
+  [% ELSIF message_tag == "quips_approved_unapproved" %]
+    [% IF approved.size == 1 %]
+      One quip
+    [% ELSE %]
+      [% approved.size %] quips
+    [% END %]
+    approved and
+    [% IF unapproved.size == 1 %]
+      one quip
+    [% ELSE %]
+      [%+ unapproved.size %] quips
+    [% END %]
+    unapproved.
+
   [% ELSIF message_tag == "report_created" %]
     OK, you have a new saved report named <em>[% reportname FILTER html %]</em>.
 
@@ -808,9 +824,9 @@
     The saved report <em>[% reportname FILTER html %]</em> has been updated.
 
   [% ELSIF message_tag == "remaining_time_zeroed" %]
-    Pole [% field_descs.remaining_time FILTER html %] je vynulováno.
-    Je to součást procesu, kdy je [% terms.bug %] ukončen
-    nebo změněn jeho stav na jiný stav, který znamená ukončení.
+    Pole [% field_descs.remaining_time FILTER html %] bylo automaticky vynulováno.
+    Je to součást procesu, kdy je [% terms.bug %] uzavřen
+    nebo jeho stav změněn na jiný uzavřený stav.
 
   [% ELSIF message_tag == "sanitycheck" %]
     [%# We use this way to call sanitycheck-specific messages so that
@@ -833,9 +849,9 @@
       impersonating ([% target FILTER html %]).
   
   [% ELSIF message_tag == "sudo_ended" %]
-    [% title = "Sudo session complete" %]
-      The sudo session has been ended.  From this point forward, everything you 
-      do you do as yourself.
+    [% title = "Sudo sezení ukončeno" %]
+      Sudo sezení bylo ukončeno. Všechny další akce budou prováděny
+      pod vaším vlastním účtem.
 
   [% ELSIF message_tag == "series_created" %]
     [% title = "Series Created" %]
@@ -852,6 +868,12 @@
       [%+ series.subcategory FILTER html %] /
       [%+ series.name FILTER html %]</em>
       has been deleted.
+
+  [% ELSIF message_tag == "series_updated" %]
+    [% title = "Series Updated" %]
+    The series <em>[% default.category FILTER html %] /
+    [%+ default.subcategory FILTER html %] /
+    [%+ default.name FILTER html %]</em> has been updated.
 
   [% ELSIF message_tag == "shutdown" %]
     [% title = "$terms.Bugzilla is Down" %]
@@ -920,11 +942,11 @@
 [%# Give sensible error if the message function is used incorrectly. #%]
 [% IF !message %]
   [% message = BLOCK %]
-    You are using [% terms.Bugzilla %]'s messaging functions incorrectly. You
-    passed in the string '[% message_tag %]'. The correct use is to pass
-    in a tag, and define that tag in the file messages.html.tmpl.<br>
+    Pravděpodobně nepoužíváte správně funkce pro zasílání zpráv.
+    Předáno bylo v '[% message_tag FILTER html %]'. Správný způsob je předat
+    v tagu, a definovat tento tag v souboru <kbd>messages.html.tmpl</kbd>.<br>
     <br>
-    If you are a [% terms.Bugzilla %] end-user seeing this message, please
-    save this page and send it to [% Param('maintainer') %].
+    Pokud jste koncový uživatel systému [% terms.Bugzilla %] a vidíte tuto zprávu, prosim
+    uložte či ofoťte tuto stránku a pošlete [% Param('maintainer') %].
   [% END %]
 [% END %]

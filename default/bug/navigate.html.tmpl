@@ -21,24 +21,32 @@
     [% Hook.process("links") %]
     <li>&nbsp;-&nbsp;<a href="#">Začátek stránky </a></li>
     </ul>
-[% END %]        
+[% END %]
 
-
-<div class="navigation">
 [% SET my_search = user.recent_search_for(bug) %]
 [% IF my_search %]
+  <div class="navigation">
   [% SET last_bug_list = my_search.bug_list %]
   [% SET this_bug_idx = lsearch(last_bug_list, bug.id) %]
-  <b>Seznam [% terms.Bug %]:</b>
+  <b>Seznam [% terms.bugu %]:</b>
 
   ([% this_bug_idx + 1 %] of [% last_bug_list.size %])
 
-  <a href="show_bug.cgi?id=
-           [%- last_bug_list.first FILTER uri %]&amp;list_id=
-           [%- my_search.id FILTER uri %]">První</a>
-  <a href="show_bug.cgi?id=
-           [%- last_bug_list.last FILTER uri %]&amp;list_id=
-           [%- my_search.id FILTER uri %]">Poslední</a>
+  [% IF this_bug_idx > 0 %]
+    <a href="show_bug.cgi?id=
+             [%- last_bug_list.first FILTER uri %]&amp;list_id=
+             [%- my_search.id FILTER uri %]">První</a>
+  [% ELSE %]
+    <span class="navigation_link">První</span>
+  [% END %]
+
+  [% IF this_bug_idx + 1 < last_bug_list.size %]
+    <a href="show_bug.cgi?id=
+             [%- last_bug_list.last FILTER uri %]&amp;list_id=
+             [%- my_search.id FILTER uri %]">Poslední</a>
+  [% ELSE %]
+    <span class="navigation_link">Poslední</span>
+  [% END %]
 
   [% IF this_bug_idx > 0 %]
     [% prev_bug = this_bug_idx - 1 %]
@@ -46,7 +54,7 @@
              [%- last_bug_list.$prev_bug FILTER uri %]&amp;list_id=
              [%- my_search.id FILTER uri %]">Předchozí</a>
   [% ELSE %]
-    <i><font color="#777777">Předchozí</font></i>
+    <span class="navigation_link">Předchozí</span>
   [% END %]
 
   [% IF this_bug_idx + 1 < last_bug_list.size %]
@@ -55,19 +63,10 @@
              [%- last_bug_list.$next_bug FILTER uri %]&amp;list_id=
              [%- my_search.id FILTER uri %]">Další</a>
   [% ELSE %]
-    <i><font color="#777777">Další</font></i>
+    <span class="navigation_link">Další</span>
   [% END %]
 
   &nbsp;&nbsp;<a href="buglist.cgi?regetlastlist=
               [%- my_search.id FILTER uri %]">Zobrazit výsledky posledního hledání</a>
-[% ELSE %]
-  [%# With no list, don't show link to search results %]
-  <i><font color="#777777">První</font></i>
-  <i><font color="#777777">Poslední</font></i>
-  <i><font color="#777777">Předchozí</font></i>
-  <i><font color="#777777">Další</font></i>
-  &nbsp;&nbsp;
-  <i><font color="#777777">Tento požadavek není ve Vašich posledních
-    výsledcích vyhledávání.</font></i>
+  </div>
 [% END %]
-</div>

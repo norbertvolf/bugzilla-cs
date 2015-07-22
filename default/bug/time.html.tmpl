@@ -13,6 +13,7 @@
     #             1 decimal place; czech: , instead of . ?
     #%]
   [% time_unit = time_unit FILTER format('%.2f') %]
+  [% time_unit = time_unit.replace(',', '.') %]
   [% time_unit.replace('0\Z', '') %]
 [% END %]
 
